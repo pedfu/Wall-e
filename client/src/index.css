@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+@media screen and (min-width: 480px) {
+  .card:nth-child(7n + 1) {
+      grid-column: auto/span 2;
+      grid-row: auto/span 2;
+  }
+}
+
+.prompt::-webkit-scrollbar {
+  width: 5px;
+}
+ 
+.prompt::-webkit-scrollbar-thumb {
+  background-color: #a1a1a1;
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(185, 185, 185, .2);
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(224, 224, 224, .9);
+  border-radius: 14px;
+  border: 1px solid grey;
+}
+
+.dot-collision {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 5px;
+  background-color: #EAEAEA;
+  color: #EAEAEA;
+}
+.dot-collision::before, .dot-collision::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.dot-collision::before {
+  left: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 5px;
+  background-color: #EAEAEA;
+  color: #EAEAEA;
+  animation: dot-collision-before 2s infinite ease-in;
+}
+.dot-collision::after {
+  left: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 5px;
+  background-color: #EAEAEA;
+  color: #EAEAEA;
+  animation: dot-collision-after 2s infinite ease-in;
+  animation-delay: 1s;
+}
+
+@keyframes dot-collision-before {
+  0%, 50%, 75%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-15px);
+  }
+}
+@keyframes dot-collision-after {
+  0%, 50%, 75%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(15px);
+  }
+}
+
+.coming-soon {
+  margin-top: calc(50% - 73px);
+  transform: translate(0, 50%);
+}
+
+.content-1 {
+  background-color: rgba(100,100,100,.5);
+}
+.content-2 {
+  background-color: rgba(100,100,100,.5);
+}
+
+/* ABOUT */
+.home_card h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: .25rem;
+  margin-bottom: 1rem;
+  opacity: .8;
+}
+
+.home_card p {
+  letter-spacing: .1rem;
+  opacity: .8;
+}
+
+.home_card div {
+  padding: 1.5rem;
+}
