@@ -14,3 +14,23 @@ ADICIONAR CONTEXT PRA SALVAR LOGIN
 VERIFICAT SE NAO ESTIVER LOGADO, EXIGE O CREATE NO TOPO? MAS TB PRECISA MOSTRAR O BOTAO DE DESLOGAR
 
 FLEX STRETCH PRA OCULPAR TODA TELA
+
+# Technologies used
+
+- Vite: faster server start, instant update (invalidate the chain betwwen the edited module and its closest HMR - hot module replacement - boundary).
+- Tailwind: CSS framework.
+- Redux-thunk: allow dispatch to call a thunk service or function, and then (inside thunk) call new dispatches with error, success or other cases.
+- Redux-promise-middleware: robust way to handle async actions. Transform the action in pending, fulfulled or rejected actions.
+- Redux-devtools: allow to use redux console in development mode
+- React-cookies: load and save cookies using React
+- Redux-logger: allow developer to check redux action in console
+
+# Structure
+
+- assests
+- components
+- constants
+- hooks
+- pages
+- store
+- utils
