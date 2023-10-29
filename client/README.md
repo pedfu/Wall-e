@@ -24,6 +24,9 @@ FLEX STRETCH PRA OCULPAR TODA TELA
 - Redux-devtools: allow to use redux console in development mode
 - React-cookies: load and save cookies using React
 - Redux-logger: allow developer to check redux action in console
+- Redux-define: allow action type with subactions, such as ERROR, SUCCESS, FULFILLED, PENDING...
+- Axios
+- Humps
 
 # Structure
 

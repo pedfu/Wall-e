@@ -12,7 +12,9 @@
   "dependencies": {
     "@redux-devtools/extension": "^3.2.5",
     "@reduxjs/toolkit": "^1.9.7",
+    "axios": "^1.6.0",
     "file-saver": "^2.0.5",
+    "humps": "^2.0.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-cookies": "^0.1.1",

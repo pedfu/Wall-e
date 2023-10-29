@@ -6,10 +6,10 @@ import { configureStore } from '@reduxjs/toolkit'
 import logger from 'redux-logger'
 import reducers from '../modules'
 
-// const environment = process.env.ENVIRONMENT
-const environment = 'development'
+const environment = import.meta.env.VITE_ENVIRONMENT
+// const environment = 'development'
 
-const storeConfiguration = (initialState) => {
+const createStore = (initialState) => {
     if (environment === 'development') {
         return configureStore(reducers, initialState, composeWithDevTools(applyMiddleware([thunk, promise, logger])))
     }
@@ -17,4 +17,4 @@ const storeConfiguration = (initialState) => {
     return configureStore(reducers, initialState, applyMiddleware([thunk, promise]))
 }
 
-export default storeConfiguration
+export default createStore

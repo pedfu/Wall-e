@@ -1,15 +1,23 @@
-import React from 'react'
+import { useDispatch } from 'react-redux'
+import { login, logout } from '../modules/authentication/actions'
 
 export default () => {
   // dispatch
+  const dispatch = useDispatch()
   
-  // login -> (user, password)
-    // api call
-    // api response
-    // save login (dispatch with payload)
-
-  // logout
-    // dispatch (clean login data)
+  return {
+    login: async credentials => {
+      try {
+        const response = await ServiceWorker.login(credentials)
+        dispatch(login(response))
+      } catch (error) {
+        return error  
+      }
+    },
+    logout: () => {
+      dispatch(logout())
+    }
+  }
 }
 
 // reducer for login
@@ -17,10 +25,3 @@ export default () => {
 
 // reducer for logout
     // use cookies.remove to remove saved data
-
-
-// action for login
-    // call LOGIN action with payload
-
-// action for logout
-    // call LOGOUT action
