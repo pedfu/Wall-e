@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import cookies from 'react-cookies'
@@ -18,9 +17,6 @@ const root = () => {
   }
 
   const store = createStore(initialState)
-
-  console.log(import.meta.env.VITE_ENVIRONMENT)
-  console.log(import.meta.env.ENVIRONMENT)
 
   ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>

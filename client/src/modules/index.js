@@ -1,6 +1,10 @@
 import { combineReducers } from "redux";
 import authentication from './authentication/reducer'
+import loading from './loading/reducer'
 
-export default combineReducers({
+const combinedReducers = combineReducers({
     authentication,
+    loading,
 })
+
+export default combinedReducers

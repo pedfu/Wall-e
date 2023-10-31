@@ -1,12 +1,29 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FormField } from '../components'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { login } from '../modules/authentication/actions'
+import { loadingLoginSelector } from '../modules/authentication/selector'
+import { usePrevious } from '../hooks/use-previous'
 
 const Login = () => {
+    const dispatch = useDispatch()
     const [state, setState] = useState({
         email: '',
         password: ''
     })
+    const isLoginLoading = useSelector(loadingLoginSelector)
+    const wasLoginLoading = usePrevious(isLoginLoading)
+  
+    useEffect(() => {
+      if (!isLoginLoading && wasLoginLoading) {
+        // if (!errors)
+        setState({
+            email: '',
+            password: ''
+        })
+      }
+    }, [isLoginLoading, wasLoginLoading])
 
     const onChange = useCallback(event => {
         const { name, value } = event.target
@@ -16,11 +33,17 @@ const Login = () => {
         }))
     }, [])
 
+    const onSubmit = useCallback(event => {
+        event.preventDefault()
+
+        dispatch(login(state))
+    }, [state, dispatch])
+
   return (
     <div className='flex'>
         <div className='w-1/2 mx-6 flex flex-col justify-between py-20 px-16'>
             <h1 className='font-semibold text-4xl text-center'>Welcome back</h1>
-            <form className='flex flex-col justify-center'>
+            <form className='flex flex-col justify-center' onSubmit={onSubmit}>
                 <FormField
                     className="mb-4"
                     labelName="Email"

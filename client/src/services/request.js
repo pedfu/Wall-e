@@ -1,7 +1,5 @@
 import axios from 'axios'
-import humps from 'humps'
 import { parseConfig } from '../utils/request'
-import { createFormData } from '../utils/helpers'
 
 const instance = axios.create({
     baseURL: import.meta.env.VITE_BASE_API_URL,
@@ -12,21 +10,21 @@ const instance = axios.create({
 
 export const handleResponseError = error => new Promise((resolve, reject) => (error?.response?.data ? reject(error.response.data) : reject()))
 
-const decamelizePayload = data => data instanceof FormData ? createFormData(data, false) : humps.decamelizeKeys(data)
+// const decamelizePayload = data => data instanceof FormData ? createFormData(data, false) : humps.decamelizeKeys(data)
 
-const parsePayload = ({
-    data,
-    transformPayload,
-    transformOnlyRequest,
-    transformOnlyResponse,
-    transformFormData,
-}) => {
-    const shouldTransformData = (transformPayload || transformOnlyRequest) && !transformOnlyResponse
-    if (transformFormData) {
-       return createFormData(data, shouldTransformData)
-    }
-    return shouldTransformData ? decamelizePayload(data) : data
-}
+// const parsePayload = ({
+//     data,
+//     transformPayload,
+//     transformOnlyRequest,
+//     transformOnlyResponse,
+//     transformFormData,
+// }) => {
+//     const shouldTransformData = (transformPayload || transformOnlyRequest) && !transformOnlyResponse
+//     if (transformFormData) {
+//        return createFormData(data, shouldTransformData)
+//     }
+//     return shouldTransformData ? decamelizePayload(data) : data
+// }
 
 const parseParams = (url, config, data, baseURL = null) => method => {
     const {

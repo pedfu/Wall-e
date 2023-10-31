@@ -8,8 +8,7 @@ export default () => {
   return {
     login: async credentials => {
       try {
-        const response = await ServiceWorker.login(credentials)
-        dispatch(login(response))
+        dispatch(login(credentials))
       } catch (error) {
         return error  
       }
