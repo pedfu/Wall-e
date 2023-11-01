@@ -5,9 +5,11 @@ export const LOGIN = defineAction('LOGIN')
 export const LOGOUT = defineAction('LOGOUT')
 
 // not a dispatch because you should login via useAuthentication
-export const login = ( credentials ) => (dispatch) => dispatch({
+export const login = (credentials) => (dispatch) => dispatch({
     type: LOGIN.ACTION,
     payload: authenticationService.loginRequest(credentials)
 }) 
 
-export const logout = () => ({ type: LOGOUT })
+export const logout = () => (dispatch) => dispatch({ 
+    type: LOGOUT 
+})

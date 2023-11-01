@@ -1,12 +1,13 @@
 import { getActionName } from "../../utils/redux"
+import { Map } from 'immutable'
 
-const INITIAL_STATE = new Map()
+const INITIAL_STATE = Map()
 
 const isPending = actionType => actionType.toString().includes('PENDING')
 
 const isCompleted = actionType => actionType.toString().includes('FULFILLED') || actionType.toString().includes('REJECTED')
 
-const reducer = (state = INITIAL_STATE, action) => {
+export default (state = INITIAL_STATE, action) => {
     const actionName = getActionName(action.type)
     const actionCount = `${actionName}_COUNT`
     const count = state.get(actionCount) || 0
@@ -20,5 +21,3 @@ const reducer = (state = INITIAL_STATE, action) => {
 
     return state
 }
-
-export default reducer

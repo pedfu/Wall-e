@@ -1,29 +1,35 @@
 import { useCallback, useEffect, useState } from 'react'
 import { FormField } from '../components'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { login } from '../modules/authentication/actions'
-import { loadingLoginSelector } from '../modules/authentication/selector'
+import { errorLoginSelector, isLoggedSelector, loadingLoginSelector } from '../modules/authentication/selector'
 import { usePrevious } from '../hooks/use-previous'
+import Button from '../components/Button'
 
 const Login = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [state, setState] = useState({
         email: '',
         password: ''
     })
+    const errorLogin = useSelector(errorLoginSelector)
     const isLoginLoading = useSelector(loadingLoginSelector)
-    const wasLoginLoading = usePrevious(isLoginLoading)
-  
+    const isLogged = useSelector(isLoggedSelector)
+    const wasLogged = usePrevious(isLogged)
+    console.log('teste', isLoginLoading)
+
     useEffect(() => {
-      if (!isLoginLoading && wasLoginLoading) {
-        // if (!errors)
-        setState({
-            email: '',
-            password: ''
-        })
-      }
-    }, [isLoginLoading, wasLoginLoading])
+        if (isLogged && state.email && state.password && !isLoginLoading) {
+            navigate('/')
+
+            setState({
+                email: '',
+                password: ''
+            })
+        }
+    }, [isLogged, navigate, wasLogged, isLoginLoading])
 
     const onChange = useCallback(event => {
         const { name, value } = event.target
@@ -35,7 +41,6 @@ const Login = () => {
 
     const onSubmit = useCallback(event => {
         event.preventDefault()
-
         dispatch(login(state))
     }, [state, dispatch])
 
@@ -63,7 +68,7 @@ const Login = () => {
                     handleChange={onChange}
                 />
                 <Link className='text-sm text-right mb-4 mt-2 underline'>Forgot password?</Link>
-                <button className='py-4 px-16 mt-4 border rounded-[5rem]'>Log in</button>
+                <Button isLoading={isLoginLoading}>Log in</Button>
                 <p className='text-sm mt-2'>Don't have an account? <Link to='/sign-up' className='font-semibold underline cursor-pointer'>Sign up</Link></p>
             </form>
 

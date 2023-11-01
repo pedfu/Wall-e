@@ -11,3 +11,4 @@ export const isLoggedSelector = createSelector(
 )
 
 export const loadingLoginSelector = ({ loading }) => !!loading.get(LOGIN.ACTION)
+export const errorLoginSelector = ({ error }) => error.get(LOGIN.ACTION)
