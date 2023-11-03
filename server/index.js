@@ -4,7 +4,8 @@ import cors from 'cors'
 
 import connectDB from './mongodb/connect.js'
 import postRoutes from './routes/postRoutes.js' 
-import dalleRoutes from './routes/dalleRoutes.js' 
+import authRoutes from './routes/auth.js' 
+import userRoutes from './routes/user.js'
 
 dotenv.config()
 const PORT = process.env.PORT || 8080
@@ -15,7 +16,8 @@ app.use(cors())
 app.use(express.json({ limit: '50mb' }))
 
 app.use('/api/v1/post', postRoutes)
-app.use('/api/v1/dalle', dalleRoutes)
+app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/user', userRoutes)
 
 app.get('/', async (req, res) => {
     res.status(400)

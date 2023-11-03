@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 
-const Post = new mongoose.Schema({
+const PostSchema = new mongoose.Schema({
     createdBy: {
         username: { type: String, required: true },
         userId: { type: String, required: true }
     },
-    createdAt: { type: Date, default: Date.now },
     comments: [{
         createdBy: {
             username: { type: String, required: true },
@@ -20,8 +19,8 @@ const Post = new mongoose.Schema({
         userId: { type: String, required: true },
     }],
     isPublic: { type: Boolean, default: true },
-})
+}, { timestamps: true })
 
-const PostSchema = mongoose.model('Post', Post)
+const Post = mongoose.model('Post', PostSchema)
 
-export default PostSchema
+export default Post

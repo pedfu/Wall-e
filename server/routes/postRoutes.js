@@ -1,13 +1,11 @@
 import express from "express";
 import * as dotenv from 'dotenv'
-import { v2 as cloudinary } from 'cloudinary'
 import { client, GenerationStyle, Status } from "imaginesdk"
-
-const imagine = client(process.env.IMAGINEART_API_KEY);
-
-import PostSchema from "../mongodb/models/post.js";
+import Post from "../mongodb/models/post.js";
 
 dotenv.config()
+
+const imagine = client(process.env.IMAGINEART_API_KEY);
 
 const router = express.Router()
 
@@ -35,7 +33,7 @@ router.route('/').post(async (req, res) => {
         const image = response.data().base64()
 
         // create post
-        const post = new PostSchema({
+        const post = new Post({
             description: '',
             image,
             createdBy: {
@@ -59,7 +57,7 @@ router.route('/').put(async (req, res) => {
     const { _id, description, isPublic } = req.body
 
     try {
-        PostSchema.findByIdAndUpdate(_id, { description: description, isPublic: isPublic || true }, (err, docs) => {
+        Post.findByIdAndUpdate(_id, { description: description, isPublic: isPublic || true }, (err, docs) => {
             if (err) {
                 res.status(404).json({ error: 'Post not found.' })
             } else {

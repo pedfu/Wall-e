@@ -35,3 +35,17 @@ CRIA POST PUBLIC FALSE
 RETURNA POST PRO USUARIO COM IMAGEM CRIADA
 
 SE O USUARIO POSTA -> TORNA TRUE E ADICIONA DES OU OUTRO
+
+FOI ADICIONADO -> import FormData from 'form-data'; EM index.modern.mjs em imaginesdk/dist
+
+TROCAR SDK POR CHAMDA POR API DA IMAGINESDK
+-> https://platform.imagine.art/playground/text-to-image
+
+# Authentication
+
+- User
+- Login
+  - Generate a JSON Web Toke (JWT) to authenticate the user
+
+bcrypt -> encript password
+jsonwebtoken -> generate JWT
