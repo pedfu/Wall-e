@@ -9,7 +9,11 @@ const register = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10)
         const user = new User({ username, email, password: hashedPassword, ipAddress })
         await user.save()
-        res.json({ message: 'Registration successful' })
+        
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
+            expiresIn: '7d'
+        })
+        res.json({ token, user })
     } catch (error) {
         next(error)
     }
@@ -34,7 +38,7 @@ const login = async (req, res, next) => {
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
             expiresIn: '7d'
         })
-        res.json({ token })
+        res.json({ token, user })
     } catch (error) {
         next(error)
     }

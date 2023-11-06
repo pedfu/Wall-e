@@ -6,12 +6,12 @@ import createStore from './store/store-configuration'
 import './index.css'
 
 const root = () => {
-  const cookieKey = cookies.load('key')
+  const cookieToken = cookies.load('token')
   const cookieUser = cookies.load('user')
 
   const initialState = {
     authentication: {
-      key: cookieKey,
+      token: cookieToken,
       user: cookieUser
     }
   }

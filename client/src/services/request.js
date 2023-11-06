@@ -41,7 +41,7 @@ const parseParams = (url, config, data, baseURL = null) => method => {
         ...(baseURL && { baseURL }), // custom baseURL
         method,
         url,
-        ...parseConfig(configParams), // key and authorizatio header
+        ...parseConfig(configParams), // key and authorization header
         ...(payloadMethodsRequired.includes(method) && {
             data
         })

@@ -11,25 +11,34 @@ const Login = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [state, setState] = useState({
-        email: '',
+        username: '',
         password: ''
     })
+    const [errors, setErrors] = useState({})
+
     const errorLogin = useSelector(errorLoginSelector)
     const isLoginLoading = useSelector(loadingLoginSelector)
     const isLogged = useSelector(isLoggedSelector)
     const wasLogged = usePrevious(isLogged)
-    console.log('teste', isLoginLoading)
 
     useEffect(() => {
-        if (isLogged && state.email && state.password && !isLoginLoading) {
+        if (isLogged && state.username && state.password && !isLoginLoading) {
             navigate('/')
 
             setState({
-                email: '',
+                username: '',
                 password: ''
             })
         }
     }, [isLogged, navigate, wasLogged, isLoginLoading])
+
+    const validateFields = useCallback(() => {
+        const error = {}
+        if (!state.username) error['username'] = 'Username not fulfilled' 
+        if (!state.password) error['password'] = 'Password not fulfilled'
+
+        setErrors(error)
+    }, [state])
 
     const onChange = useCallback(event => {
         const { name, value } = event.target
@@ -41,6 +50,8 @@ const Login = () => {
 
     const onSubmit = useCallback(event => {
         event.preventDefault()
+        validateFields()
+        if (Object.keys(errors).length > 0) return
         dispatch(login(state))
     }, [state, dispatch])
 
@@ -50,12 +61,13 @@ const Login = () => {
             <h1 className='font-semibold text-4xl text-center'>Welcome back</h1>
             <form className='flex flex-col justify-center' onSubmit={onSubmit}>
                 <FormField
-                    className="mb-4"
-                    labelName="Email"
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={state.email}
+                    className="mb-7"
+                    labelName="Username"
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    error={errors?.username}
+                    value={state.username}
                     handleChange={onChange}
                 />
                 <FormField
@@ -64,11 +76,12 @@ const Login = () => {
                     type="password"
                     name="password"
                     placeholder="Password"
+                    error={errors?.password}
                     value={state.password}
                     handleChange={onChange}
                 />
-                <Link className='text-sm text-right mb-4 mt-2 underline'>Forgot password?</Link>
-                <Button isLoading={isLoginLoading}>Log in</Button>
+                <Link className='text-sm text-right mb-4 mt-3 underline'>Forgot password?</Link>
+                <Button disabled={Object.keys(errors).length > 0} isLoading={isLoginLoading}>Log in</Button>
                 <p className='text-sm mt-2'>Don't have an account? <Link to='/sign-up' className='font-semibold underline cursor-pointer'>Sign up</Link></p>
             </form>
 

@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 
-const Button = ({ isLoading, children }) => {
+const Button = ({ isLoading, disabled, children }) => {
     
   return (
     <button 
         className='py-4 px-16 mt-4 border rounded-[5rem]' 
-        disabled={isLoading == true}
+        disabled={isLoading == true || disabled}
     >
         {isLoading == true ? 
             (
@@ -20,11 +20,13 @@ const Button = ({ isLoading, children }) => {
 
 Button.propTypes = {
     isLoading: PropTypes.bool,
+    disabled: PropTypes.bool,
     children: PropTypes.element.isRequired
 }
 
 Button.defaultProps = {
-    isLoading: null
+    isLoading: null,
+    disabled: false,
 }
 
 export default Button
