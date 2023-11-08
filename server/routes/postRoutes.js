@@ -9,10 +9,49 @@ const imagine = client(process.env.IMAGINEART_API_KEY);
 
 const router = express.Router()
 
+// get posts
 router.route('/').get(async (req, res) => {    
-    res.send('teste')
+    await Post.find().then(posts => {
+        res.status(200).send(posts)
+    })
 })
 
+// get post
+router.route('/:id').get(async (req, res) => {
+    const { id } = req.params
+    await Post.findOne({ _id: id }).then(post => {
+        res.status(200).send(post)
+    })
+})
+
+// get comments from post
+router.route('/:id/comments').get(async (req, res) => {
+    const { id } = req.params
+    await Post.findOne({ _id: id }).then(post => {
+        res.status(200).send(post.comments)
+    })
+})
+
+// add comment
+router.route('/:id/comment').post(async (req, res) => {
+    const { id } = req.params
+    const { comment, user } = req.body
+
+    const newComment = {
+        createdBy: {
+            username: user.username,
+            userId: user._id
+        },
+        comment: comment
+    }
+    await Post.findOne({ _id: id }).then(post => {
+        post.comments = [...post.comments, newComment]
+        post.save()
+        res.status(200).json({ message: 'Comment added' })
+    })
+})
+
+// generate image
 router.route('/').post(async (req, res) => {
     const { prompt, user } = req.body
     if (!prompt || !user) {
@@ -53,6 +92,7 @@ router.route('/').post(async (req, res) => {
     }
 })
 
+// create post
 router.route('/').put(async (req, res) => {
     const { _id, description, isPublic } = req.body
 
