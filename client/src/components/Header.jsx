@@ -16,9 +16,9 @@ function Header() {
   }, [logout])
   
   useEffect(() => {
-    if (!isLogged && pathname !== '/login' && pathname !== '/sign-up') {
-        navigate('/login')
-    }
+    // if (!isLogged && pathname !== '/login' && pathname !== '/sign-up') {
+    //     navigate('/login')
+    // }
   }, [isLogged, navigate, pathname])
 
   return (
