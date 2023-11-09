@@ -125,3 +125,51 @@ export const images = [
     src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg', 
   },
 ]
+
+export const mockComments = [
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+  {
+    src: 'https://cdn.openart.ai/published/PT7F1MInuEAWZ0bPSlH9/UQwIvjj2_h4z8_raw.jpg',
+    username: 'teste-username',
+    comment: 'comentario teste 123 entreg aldjas'
+  },
+]

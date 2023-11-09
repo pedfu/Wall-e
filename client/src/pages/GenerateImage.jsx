@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { LeftBar, ImageFromText } from '../components'
 import { ComingSoon } from './index';
 import { images } from '../constants';
+import { generateImage as generateImageAction } from '../modules/post/actions' 
+import { useDispatch, useSelector } from 'react-redux';
+import { errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
 
 const Image = ({ src }) => {
     return (
@@ -15,6 +18,11 @@ Image.propTypes = {
 }
 
 const GenerateImage = () => {
+  const dispatch = useDispatch()
+  const loadingGeneratePost = useSelector(loadingGeneratePostSelector)
+  const errorGeneratePost = useSelector(errorGeneratePostSelector)
+  const newPost = useSelector(newPostSelector)
+
   const [selectedTab, setSelectedTab] = useState(0)
   const [expanded, setExpanded] = useState(false)
 
@@ -43,17 +51,22 @@ const GenerateImage = () => {
   const generateImage = useCallback(async (prompt) => {
     if (!prompt) return
 
-    const result = await fetch('https://localhost:8080/api/v1/generate', {
-      method: 'POST',
-      body: {
-        prompt: prompt
-      }
-    })
+    const body = {
+      prompt: prompt
+    }
+    dispatch(generateImageAction(body))
 
-    images.push({
-      prompt: prompt,
-      src: result?.photo
-    })
+    // const result = await fetch('https://localhost:8080/api/v1/post', {
+    //   method: 'POST',
+    //   body: {
+    //     prompt: prompt
+    //   }
+    // })
+
+    // images.push({
+    //   prompt: prompt,
+    //   src: result?.photo
+    // })
   }, [])
 
   const selectedPage = useMemo(() => {

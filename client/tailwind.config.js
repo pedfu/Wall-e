@@ -22,6 +22,7 @@ export default {
       white: '#EAEAEA',
       fontGrey: '#767675',
       bgWhite: '#F9F9F9',
+      red: '#ED4337'
     },
   },
   plugins: [],

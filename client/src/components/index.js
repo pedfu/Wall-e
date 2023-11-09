@@ -2,7 +2,7 @@ import Loader from './Loader'
 import Card from './Card'
 import FormField from './FormField'
 import LeftBar from './LeftBar'
-import Details from './Details'
+import ModalDetails from './ModalDetails'
 import ImageFromText from './ImageFromText'
 
 export {
@@ -11,5 +11,5 @@ export {
     FormField,
     Loader,
     ImageFromText,
-    Details,
+    ModalDetails,
 }
