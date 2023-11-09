@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Card, ModalDetails } from '.'
 import { images } from '../constants'
@@ -69,4 +69,4 @@ ImageFromText.propTypes = {
   generateImage: PropTypes.func.isRequired
 }
 
-export default memo(ImageFromText)
+export default ImageFromText

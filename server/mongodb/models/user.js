@@ -16,6 +16,7 @@ const UserSchema = new mongoose.Schema({
         userId: { type: String, required: true },
         username: { type: String, required: true },
     }],
+    monthCount: { type: Number, default: 0, }
 }, { timestamps: true })
 
 UserSchema.pre('save', async function (next) {

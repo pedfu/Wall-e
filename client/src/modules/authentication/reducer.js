@@ -9,7 +9,6 @@ const INITIAL_STATE = {
 
 export default createReducer(INITIAL_STATE, {
     [LOGIN.FULFILLED]: (state, action) => {
-        console.log(action.payload)
         const { user, token } = action.payload.data
         cookies.save('user', JSON.stringify(user), '/') // '/' allow cookies to be accessable in all pages
         cookies.save('token', token, '/') // '/' allow cookies to be accessable in all pages

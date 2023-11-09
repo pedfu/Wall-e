@@ -2,6 +2,7 @@ import express from "express";
 import * as dotenv from 'dotenv'
 import { client, GenerationStyle, Status } from "imaginesdk"
 import Post from "../mongodb/models/post.js";
+import User from "../mongodb/models/user.js";
 
 dotenv.config()
 
@@ -47,7 +48,26 @@ router.route('/:id/comment').post(async (req, res) => {
     await Post.findOne({ _id: id }).then(post => {
         post.comments = [...post.comments, newComment]
         post.save()
-        res.status(200).json({ message: 'Comment added' })
+        res.status(200).send(post)
+    })
+})
+
+// add like
+router.route('/:id/like').post(async (req, res) => {
+    const { id } = req.params
+    const { user } = req.body
+
+    const newLike = {
+        userId: user._id
+    }
+    await Post.findOne({ _id: id }).then(post => {
+        if (post.likes.some(x => x.userId === _id)) {
+            post.likes = post.likes.filter(x => x.userId === _id)
+        } else {
+            post.likes.push(newLike)
+        }
+        post.save()
+        res.status(200).send(post)
     })
 })
 
@@ -58,10 +78,17 @@ router.route('/').post(async (req, res) => {
         return res.status(400)
             .json({ error: 'Prompt or creator data missing.' })
     }
-
-    // if ip or email already have 10 pictures generated this month, return error
-
+    
     try {
+        // if ip or email already have 10 pictures generated this month, return error
+        const possibleUsersByEmail = User.find({ email: user.email })
+        const possibleUsersByIP = User.find({ ipAddress: user.ipAddress })
+        if ([...possibleUsersByEmail, ...possibleUsersByIP].some(u => u.monthCount >= 10)) {
+            return res.status(400).json({ message: 'You have reached the max count for this month' })
+        }
+
+        const currUser = User.findOne({ _id: user._id })
+
         // request for ai art generator
         const response = await imagine.generations(
             `${prompt}`,
@@ -84,8 +111,11 @@ router.route('/').post(async (req, res) => {
             likes: [],
             comments: []
         })
+
+        currUser.monthCount = currUser.monthCount + 1
+        await currUser.save()
         await post.save()
-        return res.send(201)        
+        return res.status(201).send(post)        
     } catch (error) {
         return res.status(400)
             .json({ error: 'Something went wrong while creating your image.' })
@@ -93,15 +123,16 @@ router.route('/').post(async (req, res) => {
 })
 
 // create post
-router.route('/').put(async (req, res) => {
-    const { _id, description, isPublic } = req.body
+router.route('/:id/create-post').put(async (req, res) => {
+    const { id } = req.params
+    const { description, isPublic } = req.body
 
     try {
-        Post.findByIdAndUpdate(_id, { description: description, isPublic: isPublic || true }, (err, docs) => {
+        Post.findByIdAndUpdate(id, { description: description, isPublic: isPublic || true }, (err, docs) => {
             if (err) {
                 res.status(404).json({ error: 'Post not found.' })
             } else {
-                res.status(200).json(docs)
+                res.status(200).send(docs)
             }
         }) 
     } catch (error) {
