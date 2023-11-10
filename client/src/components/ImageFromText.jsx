@@ -3,11 +3,15 @@ import PropTypes from 'prop-types'
 import { Card, ModalDetails } from '.'
 import { images } from '../constants'
 import ModalPost from './ModalPost'
+import { useSelector } from 'react-redux'
+import { newPostSelector } from '../modules/post/selector'
 
 const ImageFromText = ({ generateImage }) => {
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [text, setText] = useState('')
   const [modalPost, setModalPost] = useState(false)
+
+  const newPost = useSelector(newPostSelector)
 
   const openDetails = useCallback((index) => {
     setSelectedIndex(index)
@@ -45,7 +49,7 @@ const ImageFromText = ({ generateImage }) => {
 
   return (
     <>
-      {modalPost && <ModalPost onClose={() => onCloseModalPost()} prompt={`${text}`} image='https://cdn.openart.ai/published/shfjBm5qNSUIwGFbjPZ2/2CkoED7Q_WizW_raw.jpg' />}
+      {modalPost && <ModalPost onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image || 'https://cdn.openart.ai/published/shfjBm5qNSUIwGFbjPZ2/2CkoED7Q_WizW_raw.jpg'} />}
       {selectedIndex !== null && (
         <ModalDetails closeDetails={closeDetails} details={images[selectedIndex]} />
       )}

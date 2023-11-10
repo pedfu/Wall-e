@@ -13,7 +13,7 @@ const PostSchema = new mongoose.Schema({
         comment: { type: String, required: true }, 
     }],
     image: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String },
     prompt: { type: String, required: true },
     likes: [{
         userId: { type: String, required: true },

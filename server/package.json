@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1493.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.0",
     "cors": "^2.8.5",
@@ -22,7 +23,8 @@
     "mongodb": "^6.2.0",
     "mongoose": "^7.6.2",
     "nodemon": "^3.0.1",
-    "openai": "^4.12.1"
+    "openai": "^4.12.1",
+    "uuid": "^9.0.1"
   },
   "resolutions": {
     "unfetch": "4.2.0"

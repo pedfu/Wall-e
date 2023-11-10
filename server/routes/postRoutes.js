@@ -3,22 +3,32 @@ import * as dotenv from 'dotenv'
 import { client, GenerationStyle, Status } from "imaginesdk"
 import Post from "../mongodb/models/post.js";
 import User from "../mongodb/models/user.js";
+import authenticate from '../middlewares/auth.js'
+import AWS from 'aws-sdk'
+import { v4 as uuidv4 } from 'uuid'
 
 dotenv.config()
+
+AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_DEFAULT_REGION,
+});
+const s3 = new AWS.S3();
 
 const imagine = client(process.env.IMAGINEART_API_KEY);
 
 const router = express.Router()
 
 // get posts
-router.route('/').get(async (req, res) => {    
+router.route('/').get(authenticate, async (req, res) => {    
     await Post.find().then(posts => {
         res.status(200).send(posts)
     })
 })
 
 // get post
-router.route('/:id').get(async (req, res) => {
+router.route('/:id').get(authenticate, async (req, res) => {
     const { id } = req.params
     await Post.findOne({ _id: id }).then(post => {
         res.status(200).send(post)
@@ -26,7 +36,7 @@ router.route('/:id').get(async (req, res) => {
 })
 
 // get comments from post
-router.route('/:id/comments').get(async (req, res) => {
+router.route('/:id/comments').get(authenticate, async (req, res) => {
     const { id } = req.params
     await Post.findOne({ _id: id }).then(post => {
         res.status(200).send(post.comments)
@@ -34,9 +44,10 @@ router.route('/:id/comments').get(async (req, res) => {
 })
 
 // add comment
-router.route('/:id/comment').post(async (req, res) => {
+router.route('/:id/comment').post(authenticate, async (req, res) => {
     const { id } = req.params
-    const { comment, user } = req.body
+    const { comment } = req.body
+    const { user } = req
 
     const newComment = {
         createdBy: {
@@ -53,9 +64,9 @@ router.route('/:id/comment').post(async (req, res) => {
 })
 
 // add like
-router.route('/:id/like').post(async (req, res) => {
+router.route('/:id/like').post(authenticate, async (req, res) => {
     const { id } = req.params
-    const { user } = req.body
+    const { user } = req
 
     const newLike = {
         userId: user._id
@@ -72,8 +83,9 @@ router.route('/:id/like').post(async (req, res) => {
 })
 
 // generate image
-router.route('/').post(async (req, res) => {
-    const { prompt, user } = req.body
+router.route('/').post(authenticate, async (req, res) => {
+    const { prompt } = req.body
+    const { user } = req
     if (!prompt || !user) {
         return res.status(400)
             .json({ error: 'Prompt or creator data missing.' })
@@ -81,27 +93,48 @@ router.route('/').post(async (req, res) => {
     
     try {
         // if ip or email already have 10 pictures generated this month, return error
-        const possibleUsersByEmail = User.find({ email: user.email })
-        const possibleUsersByIP = User.find({ ipAddress: user.ipAddress })
-        if ([...possibleUsersByEmail, ...possibleUsersByIP].some(u => u.monthCount >= 10)) {
+        console.log('inicio')
+        const combinedQuery = {
+            $or: [
+              { email: user.email },
+              { ipAddress: user.ipAddress }
+            ]
+        };          
+        const result = await User.find(combinedQuery);
+        if (result.some(u => u.monthCount >= 10)) {
             return res.status(400).json({ message: 'You have reached the max count for this month' })
         }
-
-        const currUser = User.findOne({ _id: user._id })
-
+        
         // request for ai art generator
         const response = await imagine.generations(
             `${prompt}`,
             {
-              style: GenerationStyle.IMAGINE_V5,
+                style: GenerationStyle.IMAGINE_V5,
             }
-          );
+        );
+        console.log('gerado')
         const image = response.data().base64()
+        console.log('gerado 2', image)
 
+        const imageId = uuidv4()
+
+        // save image in aws
+        const buffer = Buffer.from(image, 'base64')
+        const params = {
+            Bucket: 'pedrofamouspersons-images',
+            Key: `ai-images/${imageId}`,
+            Body: buffer,
+            ContentType: 'image/png',
+            ACL: 'public-read'
+        }
+        await s3.upload(params).promise()
+
+        console.log('salvo')
+        
         // create post
         const post = new Post({
             description: '',
-            image,
+            image: `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`,
             createdBy: {
                 userId: user._id,
                 username: user.username
@@ -111,21 +144,28 @@ router.route('/').post(async (req, res) => {
             likes: [],
             comments: []
         })
-
-        currUser.monthCount = currUser.monthCount + 1
-        await currUser.save()
+        
+        console.log('gerado post', post)
+        
+        user.monthCount = user.monthCount + 1
+        await user.save()
+        console.log('gerado post2')
         await post.save()
+        console.log('gerado post3')
         return res.status(201).send(post)        
     } catch (error) {
+        // return res.status(400)
+        //     .json({ error: 'Something went wrong while creating your image.' })
         return res.status(400)
-            .json({ error: 'Something went wrong while creating your image.' })
+            .send(error)
     }
 })
 
 // create post
-router.route('/:id/create-post').put(async (req, res) => {
+router.route('/:id/create-post').put(authenticate, async (req, res) => {
     const { id } = req.params
     const { description, isPublic } = req.body
+    const { user } = req
 
     try {
         Post.findByIdAndUpdate(id, { description: description, isPublic: isPublic || true }, (err, docs) => {
