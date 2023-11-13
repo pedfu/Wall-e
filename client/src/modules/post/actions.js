@@ -9,6 +9,7 @@ export const GET_COMMENTS = defineAction('GET_COMMENTS')
 export const GET_IMAGE = defineAction('GET_IMAGE')
 export const GET_ALL_IMAGES = defineAction('GET_ALL_IMAGES')
 export const GET_POST_DETAILS = defineAction('GET_POST_DETAILS')
+export const CHANGE_LIKE_POST = defineAction('CHANGE_LIKE_POST')
 
 export const generateImage = (body) => (dispatch) => dispatch({
     type: GENERATE_IMAGE.ACTION,
@@ -48,4 +49,9 @@ export const getPostDetails = (id) => (dispatch) => dispatch({
 export const getAllPosts = () => (dispatch) => dispatch({
     type: GET_ALL_IMAGES.ACTION,
     payload: postServices.getAllImageRequest()
+})
+
+export const likePost = (id, body) => (dispatch) => dispatch({
+    type: CHANGE_LIKE_POST.ACTION,
+    payload: postServices.likeImageRequest(id, body)
 })

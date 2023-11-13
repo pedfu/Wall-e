@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Card, ModalDetails } from '.'
-import { images } from '../constants'
 import ModalPost from './ModalPost'
 import { useSelector } from 'react-redux'
 import { allPostSelector, newPostSelector } from '../modules/post/selector'
@@ -32,20 +31,19 @@ const ImageFromText = ({ generateImage }) => {
     setModalPost(true)
   }, [generateImage, text])
 
-  const onCreatePost = useCallback(text => {
-    const data = {
-      prompt: `${text}`,
-      image: 'generated-image',
-      text: text
-    }
-    // send data
-    // close modal
+  // const onCreatePost = useCallback(text => {
+  //   const data = {
+  //     prompt: `${text}`,
+  //     image: 'generated-image',
+  //     text: text
+  //   }
+  //   // send data
+  //   // close modal
 
-    setModalPost(false)
-  }, [])
+  //   setModalPost(false)
+  // }, [])
 
   const onCloseModalPost = useCallback(() => {
-    console.log('clicado')
     setModalPost(false)
   }, [])
 

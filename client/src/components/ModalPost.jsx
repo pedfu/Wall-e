@@ -5,10 +5,9 @@ import Button from './Button'
 import { useSelector } from 'react-redux'
 import { newPostSelector } from '../modules/post/selector'
 
-const ModalPost = ({ onSubmit, onClose, prompt, image, isLoading }) => {
+const ModalPost = ({ onSubmit, onClose, prompt, isLoading }) => {
     const [text, setText] = useState('')
     const newPost = useSelector(newPostSelector)
-    console.log('teste', newPost)
 
     const onTextChange = useCallback(event => {
         const { value } = event.target
@@ -54,7 +53,6 @@ ModalPost.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     prompt: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
     isLoading: PropTypes.bool,
 }
 

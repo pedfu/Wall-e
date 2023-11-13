@@ -1,5 +1,5 @@
 import { createReducer } from "../../utils/redux";
-import { COMMENT_ON_IMAGE, GENERATE_IMAGE, GET_ALL_IMAGES, GET_COMMENTS, GET_IMAGE, LIKE_IMAGE, PUBLIC_IMAGE, GET_POST_DETAILS } from "./actions";
+import { COMMENT_ON_IMAGE, GENERATE_IMAGE, GET_ALL_IMAGES, GET_COMMENTS, GET_IMAGE, LIKE_IMAGE, PUBLIC_IMAGE, GET_POST_DETAILS, CHANGE_LIKE_POST } from "./actions";
 
 const INITIAL_STATE = {
     posts: [],
@@ -28,7 +28,6 @@ export default createReducer(INITIAL_STATE, {
         return { ...state, posts: newPosts }
     },
     [COMMENT_ON_IMAGE.FULFILLED]: (state, action) => {
-        console.log('teste', action)
         const newPosts = state.posts?.map(x => {
             if (x._id === action.payload.data._id) return action.payload.data
             else return x
@@ -45,14 +44,15 @@ export default createReducer(INITIAL_STATE, {
             if (x._id === action.payload.data._id) return action.payload.data
             else return x
         })
-        console.log('get', action)
         return { ...state, posts: newPosts, post: action.payload.data }
     },
     [GET_POST_DETAILS.FULFILLED]: (state, action) => {
-        console.log('teste', action)
         return { ...state, postDetails: action.payload.data }
     },
     [GET_ALL_IMAGES.FULFILLED]: (state, action) => {
         return { ...state, posts: action.payload.data }
+    },
+    [CHANGE_LIKE_POST.FULFILLED]: (state, action) => {
+        return { ...state, postDetails: action.payload.data }
     }
 })

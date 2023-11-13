@@ -68,15 +68,13 @@ router.route('/:id/like').post(authenticate, async (req, res) => {
     const { id } = req.params
     const { user } = req
 
-    const newLike = {
-        userId: user._id
-    }
     await Post.findOne({ _id: id }).then(post => {
-        if (post.likes.some(x => x.userId === _id)) {
-            post.likes = post.likes.filter(x => x.userId === _id)
+        if (post.likes.some(x => x.userId === user._id.toString())) {
+            post.likes = post.likes.filter(x => x.userId !== user._id.toString());
         } else {
-            post.likes.push(newLike)
-        }
+            post.likes.push({ userId: user._id });
+        }    
+
         post.save()
         res.status(200).send(post)
     })
