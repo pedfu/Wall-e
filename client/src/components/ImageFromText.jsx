@@ -4,9 +4,11 @@ import { Card, ModalDetails } from '.'
 import { images } from '../constants'
 import ModalPost from './ModalPost'
 import { useSelector } from 'react-redux'
-import { newPostSelector } from '../modules/post/selector'
+import { allPostSelector, newPostSelector } from '../modules/post/selector'
 
 const ImageFromText = ({ generateImage }) => {
+  const posts = useSelector(allPostSelector)
+
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [text, setText] = useState('')
   const [modalPost, setModalPost] = useState(false)
@@ -51,7 +53,7 @@ const ImageFromText = ({ generateImage }) => {
     <>
       {modalPost && <ModalPost onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image || 'https://cdn.openart.ai/published/shfjBm5qNSUIwGFbjPZ2/2CkoED7Q_WizW_raw.jpg'} />}
       {selectedIndex !== null && (
-        <ModalDetails closeDetails={closeDetails} details={images[selectedIndex]} />
+        <ModalDetails closeDetails={closeDetails} details={posts[selectedIndex]} />
       )}
       <div className='w-full mb-2'>
           <textarea placeholder='A realistic photograph of a young guy with red hair in space' className='w-[calc(100%-48px)] h-24 mx-4 mt-3 focus:outline-none text-white p-2 bg-grey rounded-md resize-none' rows={4} value={text} onChange={onChange} />
@@ -61,8 +63,8 @@ const ImageFromText = ({ generateImage }) => {
         </div>
 
         <div className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'>
-          {images.map((item, index) => (
-            <Card key={item.src} src={item.src} onClick={() => openDetails(index)} />
+          {posts.map((item, index) => (
+            <Card key={item.image} src={item.image} onClick={() => openDetails(index)} />
           ))}
       </div>
     </>

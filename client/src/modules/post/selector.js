@@ -1,8 +1,12 @@
-import { GENERATE_IMAGE, GET_ALL_IMAGES, GET_COMMENTS, GET_IMAGE } from "./actions"
+import { GENERATE_IMAGE, GET_ALL_IMAGES, GET_COMMENTS, GET_IMAGE, GET_POST_DETAILS } from "./actions"
 
 export const allPostSelector = ({ post }) => post.posts
 export const postSelector = ({ post }) => post.post
 export const newPostSelector = ({ post }) => post.newPost
+export const postDetailsSelector = ({ post }) => post.postDetails
+
+export const loadingPostDetailsSelector = ({ loading }) => !!loading.get(GET_POST_DETAILS.ACTION)
+export const errorPostDetailsSelector = ({ error }) => error.get(GET_POST_DETAILS.ACTION)
 
 export const loadingAllPostSelector = ({ loading }) => !!loading.get(GET_ALL_IMAGES.ACTION)
 export const errorAllPostSelector = ({ error }) => error.get(GET_ALL_IMAGES.ACTION)

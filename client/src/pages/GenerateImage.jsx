@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types';
 import { LeftBar, ImageFromText } from '../components'
 import { ComingSoon } from './index';
-import { generateImage as generateImageAction } from '../modules/post/actions' 
+import { generateImage as generateImageAction, getAllPosts } from '../modules/post/actions' 
 import { useDispatch, useSelector } from 'react-redux';
-import { errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
+import { allPostSelector, errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
 import { usePrevious } from '../hooks/use-previous';
 
 const Image = ({ src }) => {
@@ -26,6 +26,10 @@ const GenerateImage = () => {
 
   const [selectedTab, setSelectedTab] = useState(0)
   const [expanded, setExpanded] = useState(false)
+
+  useEffect(() => {
+    dispatch(getAllPosts())
+  }, [dispatch])
 
   useEffect(() => {
     if (!isLoadingGeneratePost && wasLoadingGeneratePost) {

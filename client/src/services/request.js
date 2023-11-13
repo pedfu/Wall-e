@@ -48,8 +48,6 @@ const parseParams = (url, config, data, baseURL = null) => method => {
             data
         })
     }
-
-    console.log(axiosConfig)
     
     return instance(axiosConfig).catch(handleResponseError)
 }

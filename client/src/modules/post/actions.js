@@ -8,6 +8,7 @@ export const COMMENT_ON_IMAGE = defineAction('COMMENT_ON_IMAGE')
 export const GET_COMMENTS = defineAction('GET_COMMENTS')
 export const GET_IMAGE = defineAction('GET_IMAGE')
 export const GET_ALL_IMAGES = defineAction('GET_ALL_IMAGES')
+export const GET_POST_DETAILS = defineAction('GET_POST_DETAILS')
 
 export const generateImage = (body) => (dispatch) => dispatch({
     type: GENERATE_IMAGE.ACTION,
@@ -34,12 +35,17 @@ export const getCommentsFromImage = (id) => (dispatch) => dispatch({
     payload: postServices.getCommentsFromImageRequest(id)
 })
 
-export const getImage = (id) => (dispatch) => dispatch({
+export const getPost = (id) => (dispatch) => dispatch({
     type: GET_IMAGE.ACTION,
     payload: postServices.getImageRequest(id)
 })
 
-export const getAllImage = () => (dispatch) => dispatch({
+export const getPostDetails = (id) => (dispatch) => dispatch({
+    type: GET_POST_DETAILS.ACTION,
+    payload: postServices.getImageRequest(id)
+})
+
+export const getAllPosts = () => (dispatch) => dispatch({
     type: GET_ALL_IMAGES.ACTION,
     payload: postServices.getAllImageRequest()
 })
