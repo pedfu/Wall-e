@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { parseConfig } from '../utils/request'
+import cookies from 'react-cookies'
 
 const instance = axios.create({
     baseURL: import.meta.env.VITE_BASE_API_URL,
@@ -35,13 +36,14 @@ const parseParams = (url, config, data, baseURL = null) => method => {
         ...configParams
     } = config
 
-    const payloadMethodsRequired = ['put', 'post', 'patch']
+    const token = cookies.load('token')
 
+    const payloadMethodsRequired = ['put', 'post', 'patch']
     const axiosConfig = {
         ...(baseURL && { baseURL }), // custom baseURL
         method,
         url,
-        ...parseConfig(configParams), // key and authorization header
+        ...parseConfig(token, configParams), // key and authorization header
         ...(payloadMethodsRequired.includes(method) && {
             data
         })

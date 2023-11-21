@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types';
 import { LeftBar, ImageFromText } from '../components'
 import { ComingSoon } from './index';
-import { images } from '../constants';
-import { generateImage as generateImageAction } from '../modules/post/actions' 
+import { generateImage as generateImageAction, getAllPosts } from '../modules/post/actions' 
 import { useDispatch, useSelector } from 'react-redux';
-import { errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
+import { allPostSelector, errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
+import { usePrevious } from '../hooks/use-previous';
 
 const Image = ({ src }) => {
     return (
@@ -19,12 +19,25 @@ Image.propTypes = {
 
 const GenerateImage = () => {
   const dispatch = useDispatch()
-  const loadingGeneratePost = useSelector(loadingGeneratePostSelector)
+  const isLoadingGeneratePost = useSelector(loadingGeneratePostSelector)
+  const wasLoadingGeneratePost = usePrevious(isLoadingGeneratePost)
   const errorGeneratePost = useSelector(errorGeneratePostSelector)
   const newPost = useSelector(newPostSelector)
 
   const [selectedTab, setSelectedTab] = useState(0)
   const [expanded, setExpanded] = useState(false)
+
+  useEffect(() => {
+    dispatch(getAllPosts())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (!isLoadingGeneratePost && wasLoadingGeneratePost) {
+      if (!errorGeneratePost && newPost) {
+        console.log(newPost)
+      }
+    }
+  }, [errorGeneratePost, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
 
   const options = [
     {
@@ -67,7 +80,7 @@ const GenerateImage = () => {
     //   prompt: prompt,
     //   src: result?.photo
     // })
-  }, [])
+  }, [dispatch])
 
   const selectedPage = useMemo(() => {
     if (selectedTab === 0) {

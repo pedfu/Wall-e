@@ -1,19 +1,18 @@
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import * as utils from '../utils/index.js'
+
 import User from '../mongodb/models/user.js'
 
 const register = async (req, res, next) => {
     const { username, email, password, ipAddress } = req.body
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10)
-        const user = new User({ username, email, password: hashedPassword, ipAddress })
+        const { hash, salt } = utils.generatePassword(password)
+        console.log('SALVNADO', hash)
+        const user = new User({ username, email, password: hash, salt: salt, ipAddress })
         await user.save()
-        
-        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
-            expiresIn: '7d'
-        })
-        res.json({ token, user })
+
+        const { token, expiredIn } = utils.issueJWT(user)
+        res.json({ token, expiredIn, user })
     } catch (error) {
         next(error)
     }
@@ -26,19 +25,16 @@ const login = async (req, res, next) => {
         const user = await User.findOne({ username })
     
         if (!user) {
-            return res.status(404).json({ error: 'Username not found'})
+            return res.status(401).json({ error: 'Incorrect username or password'})
         }
     
-        const passwordMatch = await user.comparePassword(password)
-        if (!passwordMatch) {
-            return res.status(401).json({ error: 'Incorrect password'})
+        const isPasswordValid = utils.isPasswordValid(password, user.password, user.salt)
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: 'Incorrect username or password'})
         }
     
-        console.log(process.env.SECRET_KEY)
-        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
-            expiresIn: '7d'
-        })
-        res.json({ token, user })
+        const { token, expiredIn } = utils.issueJWT(user) 
+        res.json({ token, user, expiredIn })
     } catch (error) {
         next(error)
     }
