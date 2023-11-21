@@ -3,6 +3,8 @@ import * as dotenv from 'dotenv'
 import cors from 'cors'
 import cookieSession from 'cookie-session'
 
+import * as utils from './utils/index.js'
+
 import connectDB from './mongodb/connect.js'
 import postRoutes from './routes/postRoutes.js' 
 import authRoutes from './routes/auth.js' 
@@ -39,6 +41,11 @@ app.post('/login', async (req, res) => {
         user: {name: 'test-user'},
         key: 'test-key'
     })
+})
+
+// ONLY CALL THIS ONE TIME (YOU NEED TO UNCOMMENT FILE GENERATION IN generateKeyPair function)
+app.get('/generate-key', (req, res) => {
+    utils.generateKeyPair()
 })
 
 const startServer = () => {

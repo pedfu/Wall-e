@@ -1,5 +1,10 @@
 import jwt from 'jsonwebtoken'
+import path from 'path'
+import fs from 'fs'
+
 import User from '../mongodb/models/user.js'
+
+const PUBLIC_KEY = fs.readFileSync(path.resolve() + '/id_public.pem')
 
 const authenticate = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1]
@@ -9,8 +14,8 @@ const authenticate = async (req, res, next) => {
     }
 
     try {
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY)
-        const user = await User.findById(decodedToken.userId)
+        const decodedToken = jwt.verify(token, PUBLIC_KEY)
+        const user = await User.findById(decodedToken.payload.sub)
         if (!user) {
             return res.status(404).json({ error: 'User not found' })
         }
