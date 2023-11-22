@@ -27,6 +27,13 @@ router.route('/').get(authenticate, async (req, res) => {
     })
 })
 
+// get liked posts
+router.route('/liked').get(authenticate, async (req, res) => {    
+    await Post.find({ 'likes.userId': req.user._id.toString() }).then(posts => {
+        res.status(200).send(posts)
+    })
+})
+
 // get post
 router.route('/:id').get(authenticate, async (req, res) => {
     const { id } = req.params

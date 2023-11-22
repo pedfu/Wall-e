@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
 
     try {
         const decodedToken = jwt.verify(token, PUBLIC_KEY)
-        const user = await User.findById(decodedToken.payload.sub)
+        const user = await User.findById(decodedToken.sub)
         if (!user) {
             return res.status(404).json({ error: 'User not found' })
         }
