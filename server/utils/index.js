@@ -53,6 +53,6 @@ export function generateKeyPair() {
     })
 
     const dirname = path.resolve()
-    // fs.writeFileSync(dirname + '/id_private.pem', keyPair.privateKey)
-    // fs.writeFileSync(dirname + '/id_public.pem', keyPair.publicKey)
+    fs.writeFileSync(dirname + '/id_private.pem', keyPair.privateKey)
+    fs.writeFileSync(dirname + '/id_public.pem', keyPair.publicKey)
 }

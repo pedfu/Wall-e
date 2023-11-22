@@ -10,9 +10,12 @@ const FormField = ({
   isSurpriseMe,
   handleSurpriseMe,
   error,
+  message,
   className,
+  icon,
+  handleIconClick,
 }) => (
-  <div className={`${className} relative`}>
+  <div className={`${className} relative ${message ? 'mb-12' : null}`}>
     <div className="flex items-center gap-2 mb-2">
       <label
         htmlFor={name}
@@ -29,6 +32,15 @@ const FormField = ({
           Surprise me
         </button>
       )}
+      {icon && (
+        <button
+          type="button"
+          onClick={handleIconClick}
+          className="font-semibold text-xs bg-[#EcECF1] py-1 px-2 rounded-[5px] text-black"
+        >
+          {icon}
+        </button>
+      )}
     </div>
     <input
       type={type}
@@ -40,7 +52,8 @@ const FormField = ({
       onChange={handleChange}
       required
     />
-    {error && <p className='absolute text-sm text-red'>{error}</p>}
+    {message && <p className='absolute text-sm text-brown'>{message}</p>}
+    {error && <p className={`absolute text-sm text-red ${message ? 'top-[90px]' : null}`}>{error}</p>}
   </div>
 );
 
@@ -55,10 +68,14 @@ FormField.propTypes = {
   handleSurpriseMe: PropTypes.func.isRequired,
   className: PropTypes.string.isRequired,
   error: PropTypes.string,
+  message: PropTypes.string,
+  icon: PropTypes.element,
+  handleIconClick: PropTypes.func,
 }
 
 FormField.defaultProps = {
-  error: null
+  error: null,
+  message: null,
 }
 
 export default FormField;
