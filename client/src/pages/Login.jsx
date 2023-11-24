@@ -56,7 +56,7 @@ const Login = () => {
     }, [state, dispatch])
 
   return (
-    <div className='flex'>
+    <div className='flex bg-bgWhite'>
         <div className='w-1/2 mx-6 flex flex-col justify-between py-20 px-16'>
             <h1 className='font-semibold text-4xl text-center'>Welcome back</h1>
             <form className='flex flex-col justify-center' onSubmit={onSubmit}>
@@ -85,9 +85,10 @@ const Login = () => {
                 <p className='text-sm mt-2'>Don't have an account? <Link to='/sign-up' className='font-semibold underline cursor-pointer'>Sign up</Link></p>
             </form>
 
-            <div className='w-full flex justify-center'>
+            {/*<div className='w-full flex justify-center'>
                 <button className='py-4 px-16 border rounded-[5rem]'>Sign up with Google</button>
-            </div>
+            </div>*/}
+            <div></div>
         </div>
         <div className='w-1/2 h-[calc(100vh-73px)] mx-6 flex items-center'>
             <img className='w-full h-[calc(100vh-90px)] object-cover rounded-3xl' src='https://cdn.openart.ai/uploads/image_random_EQzmLBWS_1664596083880_1024.webp' />

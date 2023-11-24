@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
-import { Card, FormField, Loader } from '../components'
+import { Card } from '../components'
 
 const RenderCards = ({ data, title }) => {
   if (data?.length > 0) {
@@ -16,13 +15,6 @@ RenderCards.propTypes = {
 }
 
 const Home = () => {
-  const [loading, setLoading] = useState(false)
-  const [allPosts, setAllPosts] = useState(null)
-
-  const [searchText, setSearchText] = useState('')
-  const [searchTimeout, setSearchTimeout] = useState(null)
-  const [searchedResults, setSearchedResults] = useState(null)
-
   return (
     <section className="max-w-7xl mx-auto bg-darkGrey text-bgWhite">
       <div className='flex flex-wrap justify-center home_card'>

@@ -1,25 +1,32 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Home, GenerateImage, SignUp, Login, HowToUse } from './pages'
 import Header from './components/Header'
-import { useEffect, useState } from 'react'
+import './App.css'
+import { useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { tooltipSelector } from './modules/tooltip/selector'
 
 const App = () => {
-  const [showTooltip, setShowTooltip] = useState(false)
-  const showTooltipSelector = true // add selector to this
+  const [tooltip, setTooltip] = useState({
+    show: false,
+    message: '',
+    type: 'success'
+  })
+  const tooltipData = useSelector(tooltipSelector)
 
   useEffect(() => {
-    if (showTooltip) {
+    if (tooltip.show) {
       setTimeout(() => {
-        setShowTooltip(false)
+        setTooltip(prev => ({ ...prev, show: !prev.show}))
       }, 5000)
     }
-  }, [showTooltip])
+  }, [tooltip.show])
 
   useEffect(() => {
-    if (showTooltipSelector !== null) {
-      setShowTooltip(showTooltipSelector)
+    if (tooltipData.show) {
+      setTooltip(prev => ({ ...prev, ...tooltipData }))
     }
-  }, [showTooltipSelector])
+  }, [tooltipData])
 
   return (
     <BrowserRouter>
@@ -35,9 +42,9 @@ const App = () => {
         </Routes>
       </main>
 
-      {showTooltip && (
-        <div></div>
-      )}
+      <div id='tooltip' className={`absolute top-7 w-full flex justify-center ${tooltip.show ? 'show' : ''}`}>
+        <p className={`${tooltip.type} py-3 px-8 rounded-md max-w-sm text-sm`}>{tooltip.message}</p>
+      </div>
     </BrowserRouter>
   )
 }

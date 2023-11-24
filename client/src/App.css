@@ -1,7 +1,7 @@
 #root {
   max-width: 1280px;
+  padding: 0 !important;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -44,4 +44,24 @@ body {
 
 .read-the-docs {
   color: #888;
+}
+
+#tooltip {
+  opacity: 0;
+  top: -200px;
+  transition: all 300ms ease-in-out;
+}
+#tooltip.show {
+  opacity: 1;
+  top: 20px;
+  transform: translateY(0);
+}
+#tooltip p.success {
+  background-color: #38E54D;
+}
+#tooltip p.error {
+  background-color: #F96666;
+}
+#tooltip p.default {
+  background-color: #D0D4CA;
 }

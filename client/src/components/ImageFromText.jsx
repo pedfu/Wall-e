@@ -2,11 +2,16 @@ import { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Card, ModalDetails } from '.'
 import ModalPost from './ModalPost'
-import { useSelector } from 'react-redux'
-import { allPostSelector, newPostSelector } from '../modules/post/selector'
+import { useDispatch, useSelector } from 'react-redux'
+import { allPostSelector, errorAllPostSelector, newPostSelector } from '../modules/post/selector'
+import { isLoggedSelector } from '../modules/authentication/selector'
+import { publicImage } from '../modules/post/actions'
 
 const ImageFromText = ({ generateImage }) => {
+  const dispatch = useDispatch()
   const posts = useSelector(allPostSelector)
+  const error = useSelector(errorAllPostSelector)
+  const isLoggedIn = useSelector(isLoggedSelector)
 
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [text, setText] = useState('')
@@ -31,17 +36,10 @@ const ImageFromText = ({ generateImage }) => {
     setModalPost(true)
   }, [generateImage, text])
 
-  // const onCreatePost = useCallback(text => {
-  //   const data = {
-  //     prompt: `${text}`,
-  //     image: 'generated-image',
-  //     text: text
-  //   }
-  //   // send data
-  //   // close modal
-
-  //   setModalPost(false)
-  // }, [])
+  const onCreatePost = useCallback(text => {
+    dispatch(publicImage(newPost._id, { description: text, isPublic: true }))
+    setModalPost(false)
+  }, [])
 
   const onCloseModalPost = useCallback(() => {
     setModalPost(false)
@@ -49,7 +47,7 @@ const ImageFromText = ({ generateImage }) => {
 
   return (
     <>
-      {modalPost && <ModalPost onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image || 'https://cdn.openart.ai/published/shfjBm5qNSUIwGFbjPZ2/2CkoED7Q_WizW_raw.jpg'} />}
+      {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image || 'https://cdn.openart.ai/published/shfjBm5qNSUIwGFbjPZ2/2CkoED7Q_WizW_raw.jpg'} />}
       {selectedIndex !== null && (
         <ModalDetails closeDetails={closeDetails} details={posts[selectedIndex]} />
       )}
@@ -61,9 +59,13 @@ const ImageFromText = ({ generateImage }) => {
         </div>
 
         <div className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'>
-          {posts.map((item, index) => (
+          {!error ? posts.map((item, index) => (
             <Card key={item.image} src={item.image} onClick={() => openDetails(index)} />
-          ))}
+          )) : (
+            <div className='flex w-full justify-center text-white mt-5'>
+              {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}
+            </div>
+          )}
       </div>
     </>
   )

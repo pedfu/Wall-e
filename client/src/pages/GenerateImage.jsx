@@ -4,7 +4,7 @@ import { LeftBar, ImageFromText } from '../components'
 import { ComingSoon } from './index';
 import { generateImage as generateImageAction, getAllPosts } from '../modules/post/actions' 
 import { useDispatch, useSelector } from 'react-redux';
-import { allPostSelector, errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
+import { errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
 import { usePrevious } from '../hooks/use-previous';
 import LikedImages from '../components/LikedImages';
 
@@ -76,18 +76,6 @@ const GenerateImage = () => {
       prompt: prompt
     }
     dispatch(generateImageAction(body))
-
-    // const result = await fetch('https://localhost:8080/api/v1/post', {
-    //   method: 'POST',
-    //   body: {
-    //     prompt: prompt
-    //   }
-    // })
-
-    // images.push({
-    //   prompt: prompt,
-    //   src: result?.photo
-    // })
   }, [dispatch])
 
   const selectedPage = useMemo(() => {

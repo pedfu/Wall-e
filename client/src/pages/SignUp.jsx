@@ -108,7 +108,7 @@ const SignUp = () => {
     }, [])
 
   return (
-    <div className='flex'>
+    <div className='flex bg-bgWhite'>
         <div className='w-1/2 mx-6 flex flex-col justify-between py-20 px-16'>
             <h1 className='font-semibold text-4xl text-center'>Create account</h1>
             <form className='flex flex-col justify-center' onSubmit={onSubmit}>
@@ -154,9 +154,10 @@ const SignUp = () => {
                 <p className='text-sm mt-2'>Already have an Account? <Link to='/login' className='font-semibold underline cursor-pointer'>Log in</Link></p>
             </form>
 
-            <div className='w-full flex justify-center'>
+            {/*<div className='w-full flex justify-center'>
                 <button className='py-4 px-16 border rounded-[5rem]'>Sign up with Google</button>
-            </div>
+            </div>*/}
+            <div></div>
         </div>
         <div className='w-1/2 h-[calc(100vh-73px)] mx-6 flex items-center'>
             <img className='w-full h-[calc(100vh-90px)] object-cover rounded-3xl' src='https://cdn.openart.ai/published/4yVY24VTP48ZjPPvGDzY/kqLEnPxe_p0DC_1024.webp' />
