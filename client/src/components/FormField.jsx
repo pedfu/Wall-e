@@ -35,6 +35,7 @@ const FormField = ({
       {icon && (
         <button
           type="button"
+          name={name}
           onClick={handleIconClick}
           className="font-semibold text-xs bg-[#EcECF1] py-1 px-2 rounded-[5px] text-black"
         >

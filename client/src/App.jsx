@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Home, GenerateImage, SignUp, Login, HowToUse } from './pages'
+import { Home, GenerateImage, SignUp, Login, HowToUse, ForgotPassword } from './pages'
 import Header from './components/Header'
 import './App.css'
 import { useEffect, useMemo, useState } from 'react'
@@ -37,6 +37,7 @@ const App = () => {
           <Route path='/generate-image' element={<GenerateImage />} />
           <Route path='/sign-up' element={<SignUp />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/how-to-use' element={<HowToUse />} />
           <Route path='/' element={<Home />} />
         </Routes>
