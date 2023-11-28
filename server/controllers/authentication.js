@@ -1,7 +1,11 @@
 import * as utils from '../utils/index.js'
+import * as dotenv from 'dotenv'
 
 import User from '../mongodb/models/user.js'
 import EmailCode from '../mongodb/models/emailCode.js'
+import emailTransporter from '../utils/email.js'
+
+dotenv.config()
 
 const register = async (req, res, next) => {
     const { username, email, password, ipAddress } = req.body
@@ -48,21 +52,40 @@ const forgotPassword = async (req, res, next) => {
     if (!user) return res.status(404).json({ error: 'Email account does not exist'})
     
     const randomCode = utils.generateRandomCode(5).toUpperCase()
-    const emailCode = new EmailCode({ email: user.email, code: randomCode })
-    await emailCode.save()
 
     // send email with code
+    emailTransporter.sendMail({
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'Wall-E - Email verification',
+        text: `Hi! I have heard you forgot your password and want to update it, right?\nHere is your code: ${randomCode}`
+    }, async (error, info) => {
+        if (error) {
+            console.log(error)
+            return res.status(404).json({ error: 'Something unexpected happened while sending code' })
+        }
+        const emailCode = new EmailCode({ email: user.email, code: randomCode })
+        await emailCode.save()
+        return res.status(200).send('Email sent')
+    })
 }
 
 // confirm code and create an token with user email
 const confirmCode = async (req, res, next) => {
     const { code, email } = req.body
 
-    const emailCode = await EmailCode.findOne({ email: email, code: code })
-    if (!code) return res.status(400).json({ error: 'Incorrect code' })
+    // get last code created
+    const emailCode = await EmailCode.findOne({ email: email }).sort({ _id: -1 });
+    if (!emailCode) return res.status(400).json({ error: 'Incorrect code' })
+
+    // Check if the email code was created more than 10 minutes ago
+    const tenMinutesInMilliseconds = 10 * 60 * 1000;
+    if (new Date() - emailCode.createdAt > tenMinutesInMilliseconds) {
+      return res.status(403).json({ error: 'Email code expired' });
+    }
 
     // another if for garantee (even tho already verified in the database get)
-    if (code === emailCode) {
+    if (code === emailCode.code) {
         const { token, expiresIn } = utils.issueForgotPasswordJWT(email)
         return res.status(200).json({ token, expiresIn })
     }
