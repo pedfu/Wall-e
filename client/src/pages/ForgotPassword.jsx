@@ -6,12 +6,19 @@ import { confirmCode, forgotPassword, login, updatePassword } from '../modules/a
 import { errorConfirmCodeSelector, errorForgotPasswordSelector, errorLoginSelector, errorUpdatePasswordSelector, isLoggedSelector, loadingConfirmCodeSelector, loadingForgotPasswordSelector, loadingLoginSelector, loadingUpdatePasswordSelector } from '../modules/authentication/selector'
 import { usePrevious } from '../hooks/use-previous'
 import Button from '../components/Button'
+import { containsNumbers, containsSpecialCharacters } from '../utils'
 
 const PAGE_TYPE = {
     FIRST_STEP_EMAIL: 'first_step_email',
     SECOND_STEP_CONFIRM_CODE: 'second_step_confirm_code',
     THIRD_STEP_RESET_PASSWORD: 'third_step_reset_password',
     DONE: 'DONE',
+}
+
+const PASSWORD_QUALITY = {
+    WEAK: 'weak',
+    GOOD: 'good',
+    STRONG: 'strong',
 }
 
 const ForgotPassword = () => {
@@ -70,7 +77,6 @@ const ForgotPassword = () => {
         if (!isUpdatePasswordLoading && wasUpdatePasswordLoading) {
             if (!errorUpdatePassword) {
                 navigate('/login')
-                // setPage(PAGE_TYPE.DONE)
             }
         }
     }, [isUpdatePasswordLoading, wasUpdatePasswordLoading, errorUpdatePassword, navigate])
@@ -86,33 +92,14 @@ const ForgotPassword = () => {
         }
     }, [isLogged, navigate, wasLogged, isLoginLoading])
 
-    const validateFields = useCallback(() => {
-        const error = {}
-        if (!state.email) error['email'] = 'Email not fulfilled' 
-        if (!state.confirmPassword) error['confirmPassword'] = 'Confirm password not fulfilled' 
-        if (!state.password) error['password'] = 'Password not fulfilled'
-        if (state.confirmPassword !== state.password) {
-            error['password'] = 'Password and confirm password not matching'
-            error['confirmPassword'] = 'Password and confirm password not matching'
-        }
-
-        setErrors(error)
-    }, [state])
-
     const onChange = useCallback(event => {
         const { name, value } = event.target
+        setErrors({})
         setState(prevState => ({
             ...prevState,
             [name]: value
         }))
     }, [])
-
-    const onSubmit = useCallback(event => {
-        event.preventDefault()
-        validateFields()
-        if (Object.keys(errors).length > 0) return
-        dispatch(login(state))
-    }, [state, dispatch])
 
     const handlePasswordVisibility = useCallback(type => {
         if (type === 'confirmPassword') {
@@ -128,6 +115,25 @@ const ForgotPassword = () => {
         }
     }, [])
 
+    const passwordQuality = useMemo(() => {
+        if (!state.password) return
+
+        var passwordQuality = PASSWORD_QUALITY.WEAK
+
+        if (state.password !== state.password.toLowerCase() && 
+            state.password !== state.password.toUpperCase()) {
+            passwordQuality = PASSWORD_QUALITY.GOOD
+
+            if (containsNumbers(state.password) &&
+                state.password.length >= 10 &&
+                containsSpecialCharacters(state.password)) {
+                passwordQuality = PASSWORD_QUALITY.STRONG
+            }
+        }
+
+        return passwordQuality
+    }, [state.password])
+
     const onSubmitFirstStep = useCallback((event) => {
         event.preventDefault()
         if (!state.email) return
@@ -142,9 +148,10 @@ const ForgotPassword = () => {
 
     const onSubmitThirdStep = useCallback((event) => {
         event.preventDefault()
-        if (!state.confirmPassword || !state.password || state.confirmPassword !== state.password) return
+        if (!state.confirmPassword || !state.password || state.confirmPassword !== state.password || passwordQuality !== PASSWORD_QUALITY.STRONG) return
+        
         dispatch(updatePassword({ newPassword: state.password, confirmationPassword: state.confirmPassword }))
-    }, [dispatch, state.password, state.confirmPassword])
+    }, [dispatch, state.password, state.confirmPassword, errors, passwordQuality])
 
     const renderForm = useMemo(() => {
         if (page === PAGE_TYPE.FIRST_STEP_EMAIL) {
@@ -156,11 +163,11 @@ const ForgotPassword = () => {
                         type="email"
                         name="email"
                         placeholder="Email"
-                        error={errors?.email}
+                        error={errors?.email || errorForgotPassword?.error}
                         value={state.email}
                         handleChange={onChange}
                     />
-                    <Button isLoading={false}>Send code</Button>
+                    <Button isLoading={isForgotPasswordLoading}>Send code</Button>
                 </form>
             )
         } else if (page === PAGE_TYPE.SECOND_STEP_CONFIRM_CODE) {
@@ -172,11 +179,11 @@ const ForgotPassword = () => {
                         type="text"
                         name="code"
                         placeholder="Confirmation code"
-                        error={errors?.code}
+                        error={errors?.code || errorConfirmCode?.error}
                         value={state.code}
                         handleChange={onChange}
                     />
-                    <Button isLoading={false}>Confirm code</Button>
+                    <Button isLoading={isConfirmCodeLoading}>Confirm code</Button>
                 </form>
             )
         } else if (page === PAGE_TYPE.THIRD_STEP_RESET_PASSWORD) {
@@ -188,7 +195,7 @@ const ForgotPassword = () => {
                         type={`${state.isPasswordVisible ? 'text' : 'password'}`}
                         name="password"
                         placeholder="Password"
-                        error={errors?.password}
+                        error={passwordQuality !== PASSWORD_QUALITY.STRONG && 'Your password is not strong'}
                         value={state.password}
                         handleChange={onChange}
                         icon={!state.isPasswordVisible ? <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -198,6 +205,7 @@ const ForgotPassword = () => {
                         <path d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C21.2607 12.894 20.8577 13.7338 20.3522 14.5" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>}
                         handleIconClick={handlePasswordVisibility}
+                        message={passwordQuality ? `Your password is ${passwordQuality}` : null}
                     />
                     <FormField
                         className="mb-4"
@@ -205,7 +213,7 @@ const ForgotPassword = () => {
                         type={`${state.isConfirmPasswordVisible ? 'text' : 'password'}`}
                         name="confirmPassword"
                         placeholder="Confirm password"
-                        error={errors?.confirmPassword}
+                        error={state.confirmPassword !== state.password && 'Your password do not match'}
                         value={state.confirmPassword}
                         handleChange={onChange}
                         icon={!state.isConfirmPasswordVisible ? <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -216,13 +224,29 @@ const ForgotPassword = () => {
                         </svg>}
                         handleIconClick={() => handlePasswordVisibility('confirmPassword')}
                     />
-                    <Button isLoading={false}>Reset password</Button>
+                    <Button isLoading={isUpdatePasswordLoading}>Reset password</Button>
                 </form>
             )
         } else {
             return <h5>Error</h5>
         }
-    }, [page, errors, state, onSubmitFirstStep, onSubmitSecondStep, onSubmitThirdStep, onChange, handlePasswordVisibility])
+    }, [
+        page, 
+        errors, 
+        state,
+        passwordQuality,
+        isForgotPasswordLoading,
+        isConfirmCodeLoading,
+        isUpdatePasswordLoading,
+        errorForgotPassword,
+        errorConfirmCode,
+        errorUpdatePassword,
+        onSubmitFirstStep, 
+        onSubmitSecondStep, 
+        onSubmitThirdStep, 
+        onChange, 
+        handlePasswordVisibility
+    ])
 
   return (
     <div className='flex bg-bgWhite'>
