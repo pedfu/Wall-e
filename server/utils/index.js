@@ -39,6 +39,21 @@ export function issueJWT(user) {
     }
 }
 
+export function issueForgotPasswordJWT(email) {
+    const expiresIn = '10m'
+    const payload = {
+        sub: email,
+        iat: Date.now()
+    }
+
+    const emailToken = jsonwebtoken.sign(payload, PRIVATE_KEY, { expiresIn: expiresIn, algorithm: 'RS256' })
+
+    return {
+        token: `Bearer ${emailToken}`,
+        expiresIn: expiresIn
+    }
+}
+
 export function generateKeyPair() {
     const keyPair = crypto.generateKeyPairSync('rsa', {
         modulusLength: 4096,
@@ -53,6 +68,18 @@ export function generateKeyPair() {
     })
 
     const dirname = path.resolve()
-    // fs.writeFileSync(dirname + '/id_private.pem', keyPair.privateKey)
-    // fs.writeFileSync(dirname + '/id_public.pem', keyPair.publicKey)
+    fs.writeFileSync(dirname + '/id_private.pem', keyPair.privateKey)
+    fs.writeFileSync(dirname + '/id_public.pem', keyPair.publicKey)
+}
+
+export function generateRandomCode(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomCode = '';
+  
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomCode += characters.charAt(randomIndex);
+    }
+  
+    return randomCode;
 }

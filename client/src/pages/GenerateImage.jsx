@@ -4,8 +4,9 @@ import { LeftBar, ImageFromText } from '../components'
 import { ComingSoon } from './index';
 import { generateImage as generateImageAction, getAllPosts } from '../modules/post/actions' 
 import { useDispatch, useSelector } from 'react-redux';
-import { allPostSelector, errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
+import { errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
 import { usePrevious } from '../hooks/use-previous';
+import LikedImages from '../components/LikedImages';
 
 const Image = ({ src }) => {
     return (
@@ -48,6 +49,13 @@ const GenerateImage = () => {
       
     },
     {
+        text: 'Liked images',
+        icon: <svg className='w-6 h-6' viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <title/><g id="Complete"><g id="thumbs-up">
+        <path d="M7.3,11.4,10.1,3a.6.6,0,0,1,.8-.3l1,.5a2.6,2.6,0,0,1,1.4,2.3V9.4h6.4a2,2,0,0,1,1.9,2.5l-2,8a2,2,0,0,1-1.9,1.5H4.3a2,2,0,0,1-2-2v-6a2,2,0,0,1,2-2h3v10" fill="none" stroke="#EAEAEA" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/>
+        </g></g></svg>
+    },
+    {
         text: 'Coming Soon',
         icon: <svg className='w-6 h-6' viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z" fill="#EAEAEA"/>
@@ -68,23 +76,13 @@ const GenerateImage = () => {
       prompt: prompt
     }
     dispatch(generateImageAction(body))
-
-    // const result = await fetch('https://localhost:8080/api/v1/post', {
-    //   method: 'POST',
-    //   body: {
-    //     prompt: prompt
-    //   }
-    // })
-
-    // images.push({
-    //   prompt: prompt,
-    //   src: result?.photo
-    // })
   }, [dispatch])
 
   const selectedPage = useMemo(() => {
     if (selectedTab === 0) {
       return <ImageFromText generateImage={generateImage} />
+    } else if (selectedTab === 1) {
+      return <LikedImages />
     } else {
       return <ComingSoon />
     }

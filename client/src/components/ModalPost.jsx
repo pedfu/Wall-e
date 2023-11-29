@@ -3,11 +3,12 @@ import PropTypes from 'prop-types'
 import Modal from './Modal'
 import Button from './Button'
 import { useSelector } from 'react-redux'
-import { newPostSelector } from '../modules/post/selector'
+import { loadingPostSelector, newPostSelector } from '../modules/post/selector'
 
 const ModalPost = ({ onSubmit, onClose, prompt, isLoading }) => {
     const [text, setText] = useState('')
     const newPost = useSelector(newPostSelector)
+    const isGeneratingLoading = useSelector(loadingPostSelector)
 
     const onTextChange = useCallback(event => {
         const { value } = event.target
@@ -19,7 +20,7 @@ const ModalPost = ({ onSubmit, onClose, prompt, isLoading }) => {
         <div onClick={onClose} className='absolute top-1 right-3 text-fontGrey text-xl font-bold cursor-pointer'>
             x
         </div>
-        {isLoading ? (
+        {isLoading || isGeneratingLoading ? (
             <div className='w-full h-full min-h-[400px] flex items-center justify-center'>
                 <svg className='animate-spin' width="30px" height="30px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><path fillRule="evenodd" clipRule="evenodd" d="M13.917 7A6.002 6.002 0 0 0 2.083 7H1.071a7.002 7.002 0 0 1 13.858 0h-1.012z"/></svg>
             </div>

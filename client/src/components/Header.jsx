@@ -29,7 +29,7 @@ function Header() {
 
         <div className='text-white'>
           {/* <Link to='/about' className='mr-6'>About</Link> */}
-          <Link to='/how-to-use' className='mr-6'>How to use</Link>
+          {/*<Link to='/how-to-use' className='mr-6'>How to use</Link> */}
           <Link to='/generate-image'>Generate image</Link>
         </div>
 
