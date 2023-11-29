@@ -70,10 +70,10 @@ const Login = () => {
             <form className='flex flex-col justify-center' onSubmit={onSubmit}>
                 <FormField
                     className="mb-7"
-                    labelName="Username"
+                    labelName="Username or email"
                     type="text"
                     name="username"
-                    placeholder="Username"
+                    placeholder="Username or email"
                     error={errors?.username}
                     value={state.username}
                     handleChange={onChange}

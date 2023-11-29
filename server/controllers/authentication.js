@@ -26,7 +26,12 @@ const login = async (req, res, next) => {
     const { username, password } = req.body
 
     try {
-        const user = await User.findOne({ username })
+        const user = await User.findOne({
+            $or: [
+              { username: username },
+              { email: username }
+            ]
+        })
     
         if (!user) {
             return res.status(401).json({ error: 'Incorrect username or password'})
@@ -61,7 +66,6 @@ const forgotPassword = async (req, res, next) => {
         text: `Hi! I have heard you forgot your password and want to update it, right?\nHere is your code: ${randomCode}`
     }, async (error, info) => {
         if (error) {
-            console.log(error)
             return res.status(404).json({ error: 'Something unexpected happened while sending code' })
         }
         const emailCode = new EmailCode({ email: user.email, code: randomCode })
@@ -103,7 +107,7 @@ const updatePassword = async (req, res, next) => {
 
     const { salt, hash } = utils.generatePassword(newPassword)
     user.salt = salt
-    user.hash = hash
+    user.password = hash
     await user.save()
 
     res.status(200).send('User password updated')
