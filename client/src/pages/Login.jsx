@@ -68,6 +68,7 @@ const Login = () => {
         <div className='w-1/2 mx-6 flex flex-col justify-between py-20 px-16'>
             <h1 className='font-semibold text-4xl text-center'>Welcome back</h1>
             <form className='flex flex-col justify-center' onSubmit={onSubmit}>
+                {errorLogin && <p className='text-error text-sm text-left mb-4'>{errorLogin?.error}</p>}
                 <FormField
                     className="mb-7"
                     labelName="Username or email"
@@ -96,7 +97,7 @@ const Login = () => {
                     handleIconClick={handlePasswordVisibility}
                 />
                 <Link to='/forgot-password' className='text-sm text-right mb-4 mt-3 underline'>Forgot password?</Link>
-                <Button disabled={Object.keys(errors).length > 0} isLoading={isLoginLoading}>Log in</Button>
+                <Button isLoading={isLoginLoading}>Log in</Button>
                 <p className='text-sm mt-2'>Don't have an account? <Link to='/sign-up' className='font-semibold underline cursor-pointer'>Sign up</Link></p>
             </form>
 
