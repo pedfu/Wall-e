@@ -1,8 +1,12 @@
 import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { defaultProfile } from '../assets'
+import { useSelector } from 'react-redux'
+import { userSelector } from '../modules/authentication/selector'
 
 const LeftBar = ({ options, selectedTab, onTabSelect, expanded, setExpanded }) => {
+    const user = useSelector(userSelector)
+
     const onClick = useCallback(() => {
         setExpanded(prev => !prev)
     }, [setExpanded])
@@ -32,8 +36,8 @@ const LeftBar = ({ options, selectedTab, onTabSelect, expanded, setExpanded }) =
                 <img className='w-10 h-10 object-cover rounded-full' src={defaultProfile} />                
             </div>
             <div className={`flex-col items-center text-white ${expanded ? 'block' : 'hidden sm:block'} sm:block`}>
-                <h4>Pedro Fuziwara</h4>
-                <p className='text-sm text-fontGrey'>fuziwarapedro@gmail.com</p>
+                <h4 className='text-start'>{user.username}</h4>
+                <p className='text-sm text-fontGrey'>{user.email}</p>
             </div>
         </div>
     </div>

@@ -22,7 +22,11 @@ export default {
       white: '#EAEAEA',
       fontGrey: '#767675',
       bgWhite: '#F9F9F9',
-      red: '#ED4337'
+      red: '#ED4337',
+      brown: '#8B6D37',
+      success: '#38E54D',
+      error: '#F96666',
+      default: '#D0D4CA'
     },
   },
   plugins: [],

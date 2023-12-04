@@ -5,8 +5,6 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-import User from '../mongodb/models/user.js'
-
 const PUBLIC_KEY = process.env.PUBLIC_KEY
 
 const authenticate = async (req, res, next) => {
@@ -18,12 +16,7 @@ const authenticate = async (req, res, next) => {
 
     try {
         const decodedToken = jwt.verify(token, PUBLIC_KEY)
-        const user = await User.findById(decodedToken.sub)
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' })
-        }
-
-        req.user = user
+        req.email = decodedToken.sub
         next()
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' })

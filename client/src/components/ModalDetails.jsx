@@ -38,7 +38,7 @@ const ModalDetails = ({ details, closeDetails }) => {
 
   const renderLike = useMemo(() => {
     if (!user) return
-    if (postDetails.likes.some(x => x.userId === user._id.toString())) {
+    if (postDetails.likes?.some(x => x.userId === user._id.toString())) {
       return (
         <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z" fill="#FF0000"/>
@@ -84,10 +84,10 @@ const ModalDetails = ({ details, closeDetails }) => {
                 <div className='w-full mt-3 text-white max-h-[calc(560px-235px)] overflow-y-auto'>
                   <h4 className='mb-2'>Comments</h4>
                   <div>
+                    {console.log(postDetails.comments)}
                     {postDetails.comments?.map((c, index) => (
-                      <div key={`${c.username}-${index}`} className='flex items-center my-2'>
-                        <img className='w-8 h-8 rounded-full mr-1' src={c.src} />
-                        <p className='font-medium text-sm mr-2 text-fontGrey'>{c.username}</p>
+                      <div key={`${c.createdBy.username}-${index}`} className='flex items-center my-2'>
+                        <p className='font-medium text-sm mr-2 text-fontGrey'>{c.createdBy.username}</p>
                         <p className='text-sm font-light'>{c.comment}</p>
                       </div>
                     ))}

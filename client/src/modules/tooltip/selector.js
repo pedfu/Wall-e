@@ -1,0 +1,1 @@
+export const tooltipSelector = ({ tooltip }) => tooltip

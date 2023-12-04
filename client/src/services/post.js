@@ -13,3 +13,5 @@ export const getCommentsFromImageRequest = (id) => get(`/post/${id}/comments`, {
 export const getImageRequest = (id) => get(`/post/${id}`, {}, null)
 
 export const getAllImageRequest = () => get(`/post`, {}, null)
+
+export const getLikedPostsRequest = () => get(`/post/liked`, {}, null)

@@ -1,8 +1,9 @@
 import { createReducer } from "../../utils/redux";
-import { COMMENT_ON_IMAGE, GENERATE_IMAGE, GET_ALL_IMAGES, GET_COMMENTS, GET_IMAGE, LIKE_IMAGE, PUBLIC_IMAGE, GET_POST_DETAILS, CHANGE_LIKE_POST } from "./actions";
+import { COMMENT_ON_IMAGE, GENERATE_IMAGE, GET_ALL_IMAGES, GET_COMMENTS, GET_IMAGE, LIKE_IMAGE, PUBLIC_IMAGE, GET_POST_DETAILS, CHANGE_LIKE_POST, GET_LIKED_POSTS } from "./actions";
 
 const INITIAL_STATE = {
     posts: [],
+    likedPosts: null,
     post: {},
     newPost: {},
     postDetails: {},
@@ -54,5 +55,8 @@ export default createReducer(INITIAL_STATE, {
     },
     [CHANGE_LIKE_POST.FULFILLED]: (state, action) => {
         return { ...state, postDetails: action.payload.data }
+    },
+    [GET_LIKED_POSTS.FULFILLED]: (state, action) => {
+        return { ...state, likedPosts: action.payload.data }
     }
 })

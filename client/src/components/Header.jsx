@@ -1,19 +1,29 @@
 import { useCallback, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { isLoggedSelector } from '../modules/authentication/selector'
 import useAuthentication from '../hooks/use-authentication'
+import { openModal } from '../modules/modal/actions'
 
 function Header() {
   const isLogged = useSelector(isLoggedSelector)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { logout } = useAuthentication()
 
-  const onClickLogout = useCallback(event => {
-    event.preventDefault()
+  const handleLogout = useCallback(() => {
     logout()
   }, [logout])
+
+  const onClickLogout = useCallback(() => {
+    dispatch(openModal({ 
+      show: true, 
+      title: 'Confirm Logout', 
+      description: 'Are you sure you want to log out? This will end your current session.', 
+      onConfirm: handleLogout
+    }))
+  }, [openModal, dispatch, handleLogout])
   
   useEffect(() => {
     // if (!isLogged && pathname !== '/login' && pathname !== '/sign-up') {
@@ -29,7 +39,7 @@ function Header() {
 
         <div className='text-white'>
           {/* <Link to='/about' className='mr-6'>About</Link> */}
-          <Link to='/how-to-use' className='mr-6'>How to use</Link>
+          {/*<Link to='/how-to-use' className='mr-6'>How to use</Link> */}
           <Link to='/generate-image'>Generate image</Link>
         </div>
 

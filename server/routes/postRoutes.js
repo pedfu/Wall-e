@@ -1,28 +1,23 @@
 import express from "express";
 import * as dotenv from 'dotenv'
-import { client, GenerationStyle, Status } from "imaginesdk"
 import Post from "../mongodb/models/post.js";
 import User from "../mongodb/models/user.js";
 import authenticate from '../middlewares/auth.js'
-import AWS from 'aws-sdk'
-import { v4 as uuidv4 } from 'uuid'
 
 dotenv.config()
-
-AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_DEFAULT_REGION,
-});
-const s3 = new AWS.S3();
-
-const imagine = client(process.env.IMAGINEART_API_KEY);
 
 const router = express.Router()
 
 // get posts
 router.route('/').get(authenticate, async (req, res) => {    
     await Post.find().then(posts => {
+        res.status(200).send(posts)
+    })
+})
+
+// get liked posts
+router.route('/liked').get(authenticate, async (req, res) => {    
+    await Post.find({ 'likes.userId': req.user._id.toString() }).then(posts => {
         res.status(200).send(posts)
     })
 })
@@ -91,7 +86,6 @@ router.route('/').post(authenticate, async (req, res) => {
     
     try {
         // if ip or email already have 10 pictures generated this month, return error
-        console.log('inicio')
         const combinedQuery = {
             $or: [
               { email: user.email },
@@ -102,60 +96,19 @@ router.route('/').post(authenticate, async (req, res) => {
         if (result.some(u => u.monthCount >= 10)) {
             return res.status(400).json({ message: 'You have reached the max count for this month' })
         }
-        
-        // request for ai art generator
-        const response = await imagine.generations(
-            `${prompt}`,
-            {
-                style: GenerationStyle.IMAGINE_V5,
-            }
-        );
-        console.log('gerado')
-        const image = response.data().base64()
-        console.log('gerado 2', image)
 
-        const imageId = uuidv4()
+        const { success, post } = await generateImageWithEdenAI(prompt, user)
 
-        // save image in aws
-        const buffer = Buffer.from(image, 'base64')
-        const params = {
-            Bucket: 'pedrofamouspersons-images',
-            Key: `ai-images/${imageId}`,
-            Body: buffer,
-            ContentType: 'image/png',
-            ACL: 'public-read'
+        if (success) {
+            user.monthCount = user.monthCount + 1
+            await user.save()
+            return res.status(201).send(post)        
         }
-        await s3.upload(params).promise()
 
-        console.log('salvo')
-        
-        // create post
-        const post = new Post({
-            description: '',
-            image: `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`,
-            createdBy: {
-                userId: user._id,
-                username: user.username
-            },
-            prompt,
-            isPublic: false,
-            likes: [],
-            comments: []
-        })
-        
-        console.log('gerado post', post)
-        
-        user.monthCount = user.monthCount + 1
-        await user.save()
-        console.log('gerado post2')
-        await post.save()
-        console.log('gerado post3')
-        return res.status(201).send(post)        
+        return res.status(400).json({ error: 'An unexpected error happended while generating your image.'})
     } catch (error) {
-        // return res.status(400)
-        //     .json({ error: 'Something went wrong while creating your image.' })
         return res.status(400)
-            .send(error)
+            .json({ error: 'Something went wrong while creating your image.' })
     }
 })
 

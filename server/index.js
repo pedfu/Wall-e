@@ -45,7 +45,7 @@ app.post('/login', async (req, res) => {
 
 // ONLY CALL THIS ONE TIME (YOU NEED TO UNCOMMENT FILE GENERATION IN generateKeyPair function)
 app.get('/generate-key', (req, res) => {
-    utils.generateKeyPair()
+    // utils.generateKeyPair()
 })
 
 const startServer = () => {
