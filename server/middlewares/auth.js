@@ -1,10 +1,13 @@
 import jwt from 'jsonwebtoken'
 import path from 'path'
 import fs from 'fs'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 import User from '../mongodb/models/user.js'
 
-const PUBLIC_KEY = fs.readFileSync(path.resolve() + '/id_public.pem')
+const PUBLIC_KEY = process.env.PUBLIC_KEY
 
 const authenticate = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1]

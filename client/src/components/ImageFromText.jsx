@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Card, ModalDetails } from '.'
 import ModalPost from './ModalPost'
 import { useDispatch, useSelector } from 'react-redux'
-import { allPostSelector, errorAllPostSelector, newPostSelector } from '../modules/post/selector'
+import { allPostSelector, errorAllPostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector'
 import { isLoggedSelector } from '../modules/authentication/selector'
 import { publicImage } from '../modules/post/actions'
 
@@ -18,6 +18,7 @@ const ImageFromText = ({ generateImage }) => {
   const [modalPost, setModalPost] = useState(false)
 
   const newPost = useSelector(newPostSelector)
+  const loadingNewPost = useSelector(loadingGeneratePostSelector)
 
   const openDetails = useCallback((index) => {
     setSelectedIndex(index)
@@ -47,14 +48,14 @@ const ImageFromText = ({ generateImage }) => {
 
   return (
     <>
-      {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image || 'https://cdn.openart.ai/published/shfjBm5qNSUIwGFbjPZ2/2CkoED7Q_WizW_raw.jpg'} />}
+      {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image} isLoading={loadingNewPost} />}
       {selectedIndex !== null && (
         <ModalDetails closeDetails={closeDetails} details={posts[selectedIndex]} />
       )}
       <div className='w-full mb-2'>
           <textarea placeholder='A realistic photograph of a young guy with red hair in space' className='w-[calc(100%-48px)] h-24 mx-4 mt-3 focus:outline-none text-white p-2 bg-grey rounded-md resize-none' rows={4} value={text} onChange={onChange} />
           <div className='w-[calc(100%-32px)] mt-2 flex justify-end'>
-            <button onClick={onGenerateClick} disabled={!text} className='font-inter font-medium bg-[#6469ff] text-white px-4 py-2 rounded-md disabled:opacity-50'>Generate</button>
+            <button onClick={onGenerateClick} disabled={!text || !isLoggedIn} className='font-inter font-medium bg-[#6469ff] text-white px-4 py-2 rounded-md disabled:opacity-50'>Generate</button>
           </div>
         </div>
 

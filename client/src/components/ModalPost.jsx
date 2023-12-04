@@ -1,19 +1,32 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import Modal from './Modal'
 import Button from './Button'
 import { useSelector } from 'react-redux'
 import { loadingPostSelector, newPostSelector } from '../modules/post/selector'
+import { usePrevious } from '../hooks/use-previous'
 
 const ModalPost = ({ onSubmit, onClose, prompt, isLoading }) => {
     const [text, setText] = useState('')
+    const [image, setImage] = useState('')
     const newPost = useSelector(newPostSelector)
     const isGeneratingLoading = useSelector(loadingPostSelector)
+    const wasGeneratingLoading = usePrevious(isGeneratingLoading)
 
     const onTextChange = useCallback(event => {
         const { value } = event.target
         setText(value)
     }, [])
+
+    useEffect(() => {
+        if (!isGeneratingLoading && wasGeneratingLoading) {
+            if (!error) {
+                setImage(newPost.image)
+            } else {
+                setImage(null)
+            }
+        }
+    }, [isGeneratingLoading, wasGeneratingLoading, newPost])
 
   return (
     <Modal onClose={() => onClose()} className='bg-darkGrey rounded-xl min-w-[600px] max-w-[1000px] text-white'>
@@ -28,7 +41,13 @@ const ModalPost = ({ onSubmit, onClose, prompt, isLoading }) => {
             <>
                 <h1 className='text-lg m-2'>Create post</h1>
                 <div className='mt-1 min-h-[400px] flex justify-between'>
-                    <img src={newPost?.image} className='w-[50%] m-2' />
+                    {isGeneratingLoading ? (
+                        <div className='w-[50%] m-2 flex items-center justify-center'>
+                            <svg className='animate-spin' width="30px" height="30px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><path fillRule="evenodd" clipRule="evenodd" d="M13.917 7A6.002 6.002 0 0 0 2.083 7H1.071a7.002 7.002 0 0 1 13.858 0h-1.012z"/></svg>
+                        </div>
+                    ) : (
+                        <img src={image} className='w-[50%] m-2' />
+                    )}
                     <div className='w-[50%] m-2'>
                         <label>
                             <p className='w-[calc(100%-8px)] font-light'>Prompt</p>

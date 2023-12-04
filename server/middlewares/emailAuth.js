@@ -1,8 +1,11 @@
 import jwt from 'jsonwebtoken'
 import path from 'path'
 import fs from 'fs'
+import dotenv from 'dotenv'
 
-const PUBLIC_KEY = fs.readFileSync(path.resolve() + '/id_public.pem')
+dotenv.config()
+
+const PUBLIC_KEY = process.env.PUBLIC_KEY
 
 const authenticate = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1]

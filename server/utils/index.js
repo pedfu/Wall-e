@@ -2,8 +2,11 @@ import crypto from 'crypto'
 import jsonwebtoken from 'jsonwebtoken'
 import fs from 'fs'
 import path from 'path';
+import dotenv from 'dotenv'
 
-const PRIVATE_KEY = fs.readFileSync(path.resolve() + '/id_private.pem')
+dotenv.config()
+
+const PRIVATE_KEY = process.env.PRIVATE_KEY
 
 export function isPasswordValid(password, hash, salt) {
     const hashAttempt = crypto
@@ -68,8 +71,8 @@ export function generateKeyPair() {
     })
 
     const dirname = path.resolve()
-    fs.writeFileSync(dirname + '/id_private.pem', keyPair.privateKey)
-    fs.writeFileSync(dirname + '/id_public.pem', keyPair.publicKey)
+    // fs.writeFileSync(dirname + '/id_private.pem', keyPair.privateKey)
+    // fs.writeFileSync(dirname + process.env.PUBLIC_KEY)
 }
 
 export function generateRandomCode(length) {
