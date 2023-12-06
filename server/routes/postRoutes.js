@@ -95,6 +95,7 @@ router.route('/add-image').post(authenticate, async (req, res) => {
 
     try {
         await inngest.send({ name: 'ai/generate.image', data: { prompt, user }})
+        res.send('feito')
     } catch (error) {
         
     }
