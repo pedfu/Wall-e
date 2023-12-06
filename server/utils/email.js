@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer'
-import * as dotenv from 'dotenv'
+const nodemailer = require('nodemailer')
+const dotenv = require('dotenv')
 dotenv.config()
 
 const emailTransporter = nodemailer.createTransport({
@@ -10,4 +10,4 @@ const emailTransporter = nodemailer.createTransport({
     }
 })
 
-export default emailTransporter
+module.exports = emailTransporter

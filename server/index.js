@@ -1,14 +1,14 @@
-import express from 'express'
-import * as dotenv from 'dotenv'
-import cors from 'cors'
-import cookieSession from 'cookie-session'
+const express = require('express')
+const dotenv = require('dotenv')
+const cors = require('cors')
+const cookieSession = require('cookie-session')
 
-import * as utils from './utils/index.js'
+const utils = require('./utils/index.js')
 
-import connectDB from './mongodb/connect.js'
-import postRoutes from './routes/postRoutes.js' 
-import authRoutes from './routes/auth.js' 
-import userRoutes from './routes/user.js'
+const connectDB = require('./mongodb/connect.js')
+const postRoutes = require('./routes/postRoutes.js' )
+const authRoutes = require('./routes/auth.js' )
+const userRoutes = require('./routes/user.js')
 
 dotenv.config()
 const PORT = process.env.PORT || 8080
@@ -38,6 +38,10 @@ app.use(
 app.use('/api/v1/post', postRoutes)
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/user', userRoutes)
+
+app.get('/test', (req, res) => {
+    res.send('Hiii')
+})
 
 app.get('/', async (req, res) => {
     res.status(400)

@@ -1,7 +1,7 @@
-import dotenv from 'dotenv'
-import Post from "../mongodb/models/post.js";
-import AWS from 'aws-sdk'
-import { v4 as uuidv4 } from 'uuid'
+const dotenv = require('dotenv')
+const Post = require("../mongodb/models/post.js");
+const AWS = require('aws-sdk')
+const { v4: uuidv4 } = require('uuid')
 
 dotenv.config()
 

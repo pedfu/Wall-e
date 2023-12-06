@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken'
-import path from 'path'
-import fs from 'fs'
-import dotenv from 'dotenv'
+const jwt = require('jsonwebtoken')
+const path = require('path')
+const fs = require('fs')
+const dotenv = require('dotenv')
 
 dotenv.config()
 
@@ -23,4 +23,4 @@ const authenticate = async (req, res, next) => {
     }
 }
 
-export default authenticate
+module.exports = authenticate

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const EmailCodeSchema = new mongoose.Schema({
     email: { type: String, required: true },
@@ -7,4 +7,4 @@ const EmailCodeSchema = new mongoose.Schema({
 
 const EmailCode = mongoose.model('EmailCode', EmailCodeSchema)
 
-export default EmailCode
+module.exports = EmailCode

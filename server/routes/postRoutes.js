@@ -1,8 +1,8 @@
-import express from "express";
-import * as dotenv from 'dotenv'
-import Post from "../mongodb/models/post.js";
-import User from "../mongodb/models/user.js";
-import authenticate from '../middlewares/auth.js'
+const express = require("express");
+const dotenv = require('dotenv')
+const Post = require("../mongodb/models/post.js");
+const User = require("../mongodb/models/user.js");
+const authenticate = require('../middlewares/auth.js')
 
 dotenv.config()
 
@@ -132,4 +132,4 @@ router.route('/:id/create-post').put(authenticate, async (req, res) => {
     }
 })
 
-export default router
+module.exports = router

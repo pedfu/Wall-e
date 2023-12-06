@@ -1,11 +1,11 @@
-import jwt from 'jsonwebtoken'
-import path from 'path'
-import fs from 'fs'
-import dotenv from 'dotenv'
+const jwt = require('jsonwebtoken')
+const path = require('path')
+const fs = require('fs')
+const dotenv = require('dotenv')
 
 dotenv.config()
 
-import User from '../mongodb/models/user.js'
+const User = require('../mongodb/models/user.js')
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY
 
@@ -30,4 +30,4 @@ const authenticate = async (req, res, next) => {
     }
 }
 
-export default authenticate
+module.exports = authenticate

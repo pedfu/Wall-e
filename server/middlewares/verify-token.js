@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken'
-import User from '../mongodb/models/user'
+const jwt = require('jsonwebtoken')
+const User = require('../mongodb/models/user')
 
 const verifyToken = (req, res, next) => {
     let token = req.session.token

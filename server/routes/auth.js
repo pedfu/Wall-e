@@ -1,6 +1,6 @@
-import express from 'express'
-import emailAuthenticate from '../middlewares/emailAuth.js'
-import { login, register, forgotPassword, confirmCode, updatePassword } from '../controllers/authentication.js'
+const express = require('express')
+const emailAuthenticate = require('../middlewares/emailAuth.js')
+const { login, register, forgotPassword, confirmCode, updatePassword } = require('../controllers/authentication.js')
 
 const router = express.Router()
 
@@ -10,4 +10,4 @@ router.post('/forgot-password', forgotPassword)
 router.post('/confirm-code', confirmCode)
 router.post('/update-password', emailAuthenticate, updatePassword)
 
-export default router
+module.exports = router

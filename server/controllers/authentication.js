@@ -1,13 +1,13 @@
-import * as utils from '../utils/index.js'
-import * as dotenv from 'dotenv'
+const utils = require('../utils/index.js')
+const dotenv = require('dotenv')
 
-import User from '../mongodb/models/user.js'
-import EmailCode from '../mongodb/models/emailCode.js'
-import emailTransporter from '../utils/email.js'
+const User = require('../mongodb/models/user.js')
+const EmailCode = require('../mongodb/models/emailCode.js')
+const emailTransporter = require('../utils/email.js')
 
 dotenv.config()
 
-const register = async (req, res, next) => {
+module.exports.register = async (req, res, next) => {
     const { username, email, password, ipAddress } = req.body
 
     try {
@@ -22,7 +22,7 @@ const register = async (req, res, next) => {
     }
 }
 
-const login = async (req, res, next) => {
+module.exports.login = async (req, res, next) => {
     const { username, password } = req.body
 
     try {
@@ -50,7 +50,7 @@ const login = async (req, res, next) => {
 }
 
 // verify if email exists and send code to user email
-const forgotPassword = async (req, res, next) => {
+module.exports.forgotPassword = async (req, res, next) => {
     const { email } = req.body
 
     const user = await User.findOne({ email })
@@ -75,7 +75,7 @@ const forgotPassword = async (req, res, next) => {
 }
 
 // confirm code and create an token with user email
-const confirmCode = async (req, res, next) => {
+module.exports.confirmCode = async (req, res, next) => {
     const { code, email } = req.body
 
     // get last code created
@@ -97,7 +97,7 @@ const confirmCode = async (req, res, next) => {
     return res.status(400).json({ error: 'Incorrect code' })
 }
 
-const updatePassword = async (req, res, next) => {
+module.exports.updatePassword = async (req, res, next) => {
     const { newPassword, confirmationPassword } = req.body
 
     if (newPassword !== confirmationPassword) return res.status(400).json({ error: 'Passwords do not match' })
@@ -113,10 +113,10 @@ const updatePassword = async (req, res, next) => {
     res.status(200).send('User password updated')
 }
 
-export {
-    register,
-    login,
-    forgotPassword,
-    confirmCode,
-    updatePassword
-}
+// module.exports = {
+//     register,
+//     login,
+//     forgotPassword,
+//     confirmCode,
+//     updatePassword
+// }

@@ -1,21 +1,21 @@
-import crypto from 'crypto'
-import jsonwebtoken from 'jsonwebtoken'
-import fs from 'fs'
-import path from 'path';
-import dotenv from 'dotenv'
+const crypto = require ('crypto')
+const jsonwebtoken = require ('jsonwebtoken')
+const fs = require ('fs')
+const path = require ('path')
+const dotenv = require ('dotenv')
 
 dotenv.config()
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
-export function isPasswordValid(password, hash, salt) {
+function isPasswordValid(password, hash, salt) {
     const hashAttempt = crypto
         .pbkdf2Sync(password, salt, 10000, 64, 'sha512')
         .toString('hex');
   return hashAttempt === hash;
 }
 
-export function generatePassword(password) {
+function generatePassword(password) {
     const salt = crypto.randomBytes(32).toString('hex');
     const hash = crypto
         .pbkdf2Sync(password, salt, 10000, 64, 'sha512')
@@ -27,7 +27,7 @@ export function generatePassword(password) {
     }
 }
 
-export function issueJWT(user) {
+function issueJWT(user) {
     const expiresIn = '14d'
     const payload = {
         sub: user._id,
@@ -42,7 +42,7 @@ export function issueJWT(user) {
     }
 }
 
-export function issueForgotPasswordJWT(email) {
+function issueForgotPasswordJWT(email) {
     const expiresIn = '10m'
     const payload = {
         sub: email,
@@ -57,7 +57,7 @@ export function issueForgotPasswordJWT(email) {
     }
 }
 
-export function generateKeyPair() {
+function generateKeyPair() {
     const keyPair = crypto.generateKeyPairSync('rsa', {
         modulusLength: 4096,
         publicKeyEncoding: {
@@ -75,7 +75,7 @@ export function generateKeyPair() {
     // fs.writeFileSync(dirname + process.env.PUBLIC_KEY)
 }
 
-export function generateRandomCode(length) {
+function generateRandomCode(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomCode = '';
   
@@ -85,4 +85,13 @@ export function generateRandomCode(length) {
     }
   
     return randomCode;
+}
+
+module.exports = {
+    generateRandomCode,
+    generateKeyPair,
+    issueForgotPasswordJWT,
+    issueJWT,
+    generatePassword,
+    isPasswordValid,
 }
