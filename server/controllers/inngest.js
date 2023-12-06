@@ -23,32 +23,33 @@ module.exports.generateImage = inngest.createFunction(
                 return res.status(400).json({ message: 'You have reached the max count for this month' })
             }
     
-            // request for ai art generator
-            const response = await imagine.generations(
-                `${prompt}`,
-                {
-                    style: GenerationStyle.IMAGINE_V5,
-                }
-            );
+            // // request for ai art generator
+            // const response = await imagine.generations(
+            //     `${prompt}`,
+            //     {
+            //         style: GenerationStyle.IMAGINE_V5,
+            //     }
+            // );
     
-            const image = response.data().base64()
-            const imageId = uuidv4()
+            // const image = response.data().base64()
+            // const imageId = uuidv4()
     
-            // save image in aws
-            const buffer = Buffer.from(image, 'base64')
-            const params = {
-                Bucket: 'pedrofamouspersons-images',
-                Key: `ai-images/${imageId}`,
-                Body: buffer,
-                ContentType: 'image/png',
-                ACL: 'public-read'
-            }
-            await s3.upload(params).promise()
+            // // save image in aws
+            // const buffer = Buffer.from(image, 'base64')
+            // const params = {
+            //     Bucket: 'pedrofamouspersons-images',
+            //     Key: `ai-images/${imageId}`,
+            //     Body: buffer,
+            //     ContentType: 'image/png',
+            //     ACL: 'public-read'
+            // }
+            // await s3.upload(params).promise()
             
             // create post
             const post = new Post({
                 description: '',
-                image: `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`,
+                // image: `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`,
+                image: `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/153fe7bb-213f-4c0d-b50a-1465f820f30a`,
                 createdBy: {
                     userId: user._id,
                     username: user.username
