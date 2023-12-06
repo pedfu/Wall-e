@@ -5,7 +5,7 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
     "imaginesdk": "Iverson/imagine-sdk-js",
+    "inngest": "^3.6.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.2.0",
     "mongoose": "^7.6.2",

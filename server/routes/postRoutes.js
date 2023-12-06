@@ -3,8 +3,22 @@ const dotenv = require('dotenv')
 const Post = require("../mongodb/models/post.js");
 const User = require("../mongodb/models/user.js");
 const authenticate = require('../middlewares/auth.js')
+const AWS = require('aws-sdk')
+const { v4: uuidv4 } = require('uuid')
+const { Inngest } = require('inngest')
+const { inngest } = require('../controllers/inngest.js')
+const { client, GenerationStyle, Status } = require('imaginesdk')
 
 dotenv.config()
+
+AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_DEFAULT_REGION,
+});
+const s3 = new AWS.S3();
+
+const imagine = client(process.env.IMAGINEART_API_KEY);
 
 const router = express.Router()
 
@@ -75,6 +89,17 @@ router.route('/:id/like').post(authenticate, async (req, res) => {
     })
 })
 
+router.route('/add-image').post(authenticate, async (req, res) => {
+    const { prompt } = req.body
+    const { user } = req
+
+    try {
+        await inngest.send({ name: 'ai/generate.image', data: { prompt, user }})
+    } catch (error) {
+        
+    }
+})
+
 // generate image
 router.route('/').post(authenticate, async (req, res) => {
     const { prompt } = req.body
@@ -97,15 +122,50 @@ router.route('/').post(authenticate, async (req, res) => {
             return res.status(400).json({ message: 'You have reached the max count for this month' })
         }
 
-        const { success, post } = await generateImageWithEdenAI(prompt, user)
+         // request for ai art generator
+         const response = await imagine.generations(
+            `${prompt}`,
+            {
+                style: GenerationStyle.IMAGINE_V5,
+            }
+        );
+        console.log('gerado')
+        const image = response.data().base64()
+        console.log('gerado 2', image)
 
-        if (success) {
-            user.monthCount = user.monthCount + 1
-            await user.save()
-            return res.status(201).send(post)        
+        const imageId = uuidv4()
+
+        // save image in aws
+        const buffer = Buffer.from(image, 'base64')
+        const params = {
+            Bucket: 'pedrofamouspersons-images',
+            Key: `ai-images/${imageId}`,
+            Body: buffer,
+            ContentType: 'image/png',
+            ACL: 'public-read'
         }
+        await s3.upload(params).promise()
 
-        return res.status(400).json({ error: 'An unexpected error happended while generating your image.'})
+        console.log('salvo')
+        
+        // create post
+        const post = new Post({
+            description: '',
+            image: `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`,
+            createdBy: {
+                userId: user._id,
+                username: user.username
+            },
+            prompt,
+            isPublic: false,
+            likes: [],
+            comments: []
+        })
+        
+        user.monthCount = user.monthCount + 1
+        await user.save()
+        await post.save()
+        return res.status(201).send(post)
     } catch (error) {
         return res.status(400)
             .json({ error: 'Something went wrong while creating your image.', details: error })
