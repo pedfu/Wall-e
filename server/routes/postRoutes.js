@@ -108,7 +108,7 @@ router.route('/').post(authenticate, async (req, res) => {
         return res.status(400).json({ error: 'An unexpected error happended while generating your image.'})
     } catch (error) {
         return res.status(400)
-            .json({ error: 'Something went wrong while creating your image.' })
+            .json({ error: 'Something went wrong while creating your image.', details: error })
     }
 })
 
@@ -128,7 +128,7 @@ router.route('/:id/create-post').put(authenticate, async (req, res) => {
         }) 
     } catch (error) {
         return res.status(400)
-            .json({ error: 'Something went wrong while creating your post.' })
+            .json({ error: 'Something went wrong while creating your post.', details: error })
     }
 })
 
