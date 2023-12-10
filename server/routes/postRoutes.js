@@ -1,13 +1,12 @@
-const express = require("express");
+const express = require('express');
 const dotenv = require('dotenv')
-const Post = require("../mongodb/models/post.js");
-const User = require("../mongodb/models/user.js");
+const Post = require('../mongodb/models/post.js');
+const User = require('../mongodb/models/user.js');
 const authenticate = require('../middlewares/auth.js')
 const AWS = require('aws-sdk')
 const { v4: uuidv4 } = require('uuid')
-const { Inngest } = require('inngest')
-const { inngest } = require('../controllers/inngest.js')
 const { client, GenerationStyle, Status } = require('imaginesdk')
+const { queue } = require('../queue.js')
 
 dotenv.config()
 
@@ -89,15 +88,41 @@ router.route('/:id/like').post(authenticate, async (req, res) => {
     })
 })
 
+router.route('/:id/check-status').get(authenticate, async (req, res) => {
+    const { id } = req.params
+    const post = await Post.findOne({ _id: id })
+
+    if (!post) {
+        return res.status(200).json({ status: 'failed' })
+    }
+    if (!post.image) {
+        return res.status(200).json({ status: 'processing' })
+    }
+    return res.status(200).json({ status: 'success' })
+})
+
 router.route('/add-image').post(authenticate, async (req, res) => {
     const { prompt } = req.body
     const { user } = req
 
     try {
-        await inngest.send({ name: 'ai/generate.image', data: { prompt, user }})
-        res.send('feito')
+        const post = new Post({
+            description: '',
+            createdBy: {
+                userId: user._id,
+                username: user.username
+            },
+            prompt,
+            isPublic: false,
+            likes: [],
+            comments: []
+        })
+        await post.save()
+        await queue.add('test', { prompt, user, postId: post._id })
+        res.status(201).send(post)
     } catch (error) {
-        
+        console.log(error)
+        res.status(400).send(error)
     }
 })
 
@@ -117,7 +142,7 @@ router.route('/').post(authenticate, async (req, res) => {
               { email: user.email },
               { ipAddress: user.ipAddress }
             ]
-        };          
+        };
         const result = await User.find(combinedQuery);
         if (result.some(u => u.monthCount >= 10)) {
             return res.status(400).json({ message: 'You have reached the max count for this month' })

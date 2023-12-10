@@ -1,15 +1,16 @@
+const FormData = require('form-data')
 const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const cookieSession = require('cookie-session')
+const { BullMQAdapter } = require('bull-board/bullMQAdapter.js')
+const { createBullBoard } = require('bull-board')
+const { queue } = require('./queue.js')
 
 const connectDB = require('./mongodb/connect.js')
 const postRoutes = require('./routes/postRoutes.js' )
 const authRoutes = require('./routes/auth.js' )
 const userRoutes = require('./routes/user.js')
-const { generateImage, inngest } = require('./controllers/inngest.js')
-
-const { serve } = require('inngest/lambda')
 
 dotenv.config()
 const PORT = process.env.PORT || 8080
@@ -36,14 +37,12 @@ app.use(
     })
   );
 
+const { router } = createBullBoard([new BullMQAdapter(queue)])
+app.use('/admin/queues', router)
+
 app.use('/api/v1/post', postRoutes)
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/user', userRoutes)
-
-app.use(
-    "/api/v1/inngest",
-    serve({ client: inngest, functions: [generateImage] })
-);
 
 app.get('/', async (req, res) => {
     res.status(400)
