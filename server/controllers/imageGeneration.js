@@ -61,7 +61,7 @@ module.exports.generateImageWithImagineAI = async (prompt, userData, postId) => 
         console.log('salvo')
         
         const post = await Post.findOne({ _id: postId })     
-        if (image) {
+        if (post) {
             // create post
             post.image = image
             
