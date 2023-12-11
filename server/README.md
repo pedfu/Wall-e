@@ -49,3 +49,4 @@ TROCAR SDK POR CHAMDA POR API DA IMAGINESDK
 
 bcrypt -> encript password
 jsonwebtoken -> generate JWT
+bull -> redis queue

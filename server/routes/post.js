@@ -189,9 +189,7 @@ router.route('/').post(authenticate, async (req, res) => {
                 style: GenerationStyle.IMAGINE_V5,
             }
         );
-        console.log('gerado')
         const image = response.data().base64()
-        console.log('gerado 2', image)
 
         const imageId = uuidv4()
 
@@ -205,8 +203,6 @@ router.route('/').post(authenticate, async (req, res) => {
             ACL: 'public-read'
         }
         await s3.upload(params).promise()
-
-        console.log('salvo')
         
         // create post
         const post = new Post({

@@ -34,10 +34,7 @@ const GenerateImage = () => {
   }, [dispatch])
 
   const checkStatus = useCallback(async id => {
-    console.log('tentenado')
     const response = await postServices.checkNewImageStatus(id)
-    console.log(response)
-
     if (response?.data?.status === "processing") {
       setTimeout(() => {
         checkStatus(id)

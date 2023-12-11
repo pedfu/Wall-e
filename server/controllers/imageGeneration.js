@@ -59,7 +59,6 @@ module.exports.generateImageWithImagineAI = async (prompt, userData, postId) => 
         const post = await Post.findOne({ _id: postId })     
         if (buffer) {
             // create post
-            console.log(`https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`)
             post.image = `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`
             
             user.monthCount = user.monthCount + 1
@@ -97,7 +96,6 @@ module.exports.generateImageWithEdenAI = async (prompt, userData, postId) => {
     const data = await response.json()
     const { status, items } = data[0]
     if (status === 'success') {
-        console.log(data) 
         const image = items[0].image
         const imageId = uuidv4()
 

@@ -84,7 +84,6 @@ const ModalDetails = ({ details, closeDetails }) => {
                 <div className='w-full mt-3 text-white max-h-[calc(560px-235px)] overflow-y-auto'>
                   <h4 className='mb-2'>Comments</h4>
                   <div>
-                    {console.log(postDetails.comments)}
                     {postDetails.comments?.map((c, index) => (
                       <div key={`${c.createdBy.username}-${index}`} className='flex items-center my-2'>
                         <p className='font-medium text-sm mr-2 text-fontGrey'>{c.createdBy.username}</p>

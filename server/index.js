@@ -8,7 +8,7 @@ const { createBullBoard } = require('bull-board')
 const { queue } = require('./queue.js')
 
 const connectDB = require('./mongodb/connect.js')
-const postRoutes = require('./routes/postRoutes.js' )
+const postRoutes = require('./routes/post.js' )
 const authRoutes = require('./routes/auth.js' )
 const userRoutes = require('./routes/user.js')
 
@@ -46,7 +46,7 @@ app.use('/api/v1/user', userRoutes)
 
 app.get('/', async (req, res) => {
     res.status(400)
-    res.send('Hello from DALL-E!')
+    res.send('Hello from WALL-E!')
 })
 
 const startServer = () => {
