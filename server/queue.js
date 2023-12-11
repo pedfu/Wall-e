@@ -1,6 +1,6 @@
 const dotenv = require('dotenv')
 const Bull = require('bull')
-const { generateImageWithImagineAI } = require('./controllers/imageGeneration')
+const { generateImageWithImagineAI, generateImageWithEdenAI } = require('./controllers/imageGeneration')
 
 dotenv.config()
 
@@ -18,14 +18,12 @@ const redisConfig = {
 }
 
 const queue = new Bull(queueName, redisConfig)
-queue.process('test', async (job, done) => {
-    console.log(`processing job ${JSON.stringify(job)}`)
-    await generateImageWithImagineAI(job.data?.prompt, job.data?.user, job.data?.postId)
+queue.process('generate-image', async (job, done) => {
+    await generateImageWithEdenAI(job.data?.prompt, job.data?.user, job.data?.postId)
     done()
 })
 
 module.exports.addItemToQueue = async (prompt, user) => {
-    console.log('adicionado', prompt, user)
     await queue.add({ prompt, user })
 }
 

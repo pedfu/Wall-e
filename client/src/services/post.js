@@ -15,3 +15,8 @@ export const getImageRequest = (id) => get(`/post/${id}`, {}, null)
 export const getAllImageRequest = () => get(`/post`, {}, null)
 
 export const getLikedPostsRequest = () => get(`/post/liked`, {}, null)
+
+// { prompt: '' }
+export const generateNewImage = (body) => post('/post/add-image', {}, body)
+
+export const checkNewImageStatus = (id) => get(`/post/${id}/check-status`, {}, null)

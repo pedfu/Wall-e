@@ -106,6 +106,40 @@ router.route('/add-image').post(authenticate, async (req, res) => {
     const { user } = req
 
     try {
+        const combinedQuery = {
+            $or: [
+              { email: user.email },
+              { ipAddress: user.ipAddress }
+            ]
+        };
+
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+        // Perform aggregation to count the number of posts for each user in the current month
+        const resultTotalPosts = await Post.aggregate([
+            {
+                $match: {
+                createdAt: {
+                    $gte: startOfMonth,
+                    $lte: endOfMonth,
+                },
+                },
+            },
+            {
+                $group: {
+                _id: '$createdBy.userId',
+                postCount: { $sum: 1 },
+                },
+            },
+        ])
+        const totalPosts = resultTotalPosts[0].postCount
+        console.log('Total number of posts across all users in the current month:', totalPosts)
+        if (totalPosts >= 20) {
+            return res.status(400).json({ message: 'You have reached the max count for this month' })
+        }
+
         const post = new Post({
             description: '',
             createdBy: {
@@ -118,7 +152,7 @@ router.route('/add-image').post(authenticate, async (req, res) => {
             comments: []
         })
         await post.save()
-        await queue.add('test', { prompt, user, postId: post._id })
+        await queue.add('generate-image', { prompt, user, postId: post._id })
         res.status(201).send(post)
     } catch (error) {
         console.log(error)

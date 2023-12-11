@@ -41,10 +41,64 @@ module.exports.generateImageWithImagineAI = async (prompt, userData, postId) => 
                 style: GenerationStyle.IMAGINE_V5,
             }
         );
-        console.log('gerado', response.data())
-        const image = response.data()?.base64()
-        console.log('gerado 2', image)
 
+        const image = response.data()?.base64()
+        const imageId = uuidv4()
+
+        // save image in aws
+        const buffer = Buffer.from(image, 'base64')
+        const params = {
+            Bucket: 'pedrofamouspersons-images',
+            Key: `ai-images/${imageId}`,
+            Body: buffer,
+            ContentType: 'image/png',
+            ACL: 'public-read'
+        }
+        await s3.upload(params).promise()
+        
+        const post = await Post.findOne({ _id: postId })     
+        if (buffer) {
+            // create post
+            console.log(`https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`)
+            post.image = `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`
+            
+            user.monthCount = user.monthCount + 1
+            await user.save()
+            await post.save()
+        } else {
+            await Post.deleteOne({ _id: post._id })
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+module.exports.generateImageWithEdenAI = async (prompt, userData, postId) => {
+    if (!prompt) return
+
+    const user = await User.findOne({ _id: userData._id })
+    const response = await fetch(process.env.EDEN_API_URL, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.EDEN_API_KEY}`
+        },
+        body: JSON.stringify({
+            num_images: 1,
+            providers: "stabilityai",
+            resolution: "1024x1024",
+            response_as_dict: false,
+            settings: {},
+            text: prompt
+        })
+    })
+
+    const data = await response.json()
+    const { status, items } = data[0]
+    if (status === 'success') {
+        console.log(data) 
+        const image = items[0].image
         const imageId = uuidv4()
 
         // save image in aws
@@ -58,79 +112,14 @@ module.exports.generateImageWithImagineAI = async (prompt, userData, postId) => 
         }
         await s3.upload(params).promise()
 
-        console.log('salvo')
+        const post = await Post.findOne({ _id: postId })    
+        // create post
+        post.image = `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`
         
-        const post = await Post.findOne({ _id: postId })     
-        if (post) {
-            // create post
-            post.image = image
-            
-            user.monthCount = user.monthCount + 1
-            await user.save()
-            await post.save()
-        } else {
-            await Post.deleteOne({ _id: post._id })
-            console.log('deletado')
-        }
-    } catch (error) {
-        console.error(error)
+        user.monthCount = user.monthCount + 1
+        await user.save()
+        await post.save()
+    } else {
+        await Post.deleteOne({ _id: postId })        
     }
 }
-
-// module.exports.generateImageWithEdenAI = async (prompt, user) => {
-//     if (!prompt) return
-
-//     const response = await fetch(process.env.EDEN_API_URL, {
-//         method: 'POST',
-//         headers: {
-//             Accept: 'application/json',
-//             'Content-Type': 'application/json',
-//             Authorization: `Bearer ${process.env.EDEN_API_KEY}`
-//         },
-//         body: JSON.stringify({
-//             response_as_dict: false,
-//             attributes_as_list: false,
-//             show_original_response: false,
-//             settings: JSON.stringify({ stabilityai: "stable-diffusion-v1-6" }),
-//             resolution: "1024x1024",
-//             num_images: 1,
-//             providers: "stabilityai",
-//             text: "A boy with red hat"
-//         })
-//     })
-
-//     const data = await response.json()
-//     const { status, items } = data[0]
-//     if (status === 'success') {
-//         const image = items[0].image
-//         const imageId = uuidv4()
-
-//         // save image in aws
-//         const buffer = Buffer.from(image, 'base64')
-//         const params = {
-//             Bucket: 'pedrofamouspersons-images',
-//             Key: `ai-images/${imageId}`,
-//             Body: buffer,
-//             ContentType: 'image/png',
-//             ACL: 'public-read'
-//         }
-//         await s3.upload(params).promise()
-
-//         const post = new Post({
-//             description: '',
-//             image: `${process.env.AWS_BUCKET_URL}/${imageId}`,
-//             createdBy: {
-//                 userId: user._id,
-//                 username: user.username
-//             },
-//             prompt,
-//             isPublic: false,
-//             likes: [],
-//             comments: []
-//         })
-//         await post.save()
-
-//         return { success: true, post }
-//     }
-//     return { success: false, post: null }
-// }

@@ -11,6 +11,8 @@ export const GET_ALL_IMAGES = defineAction('GET_ALL_IMAGES')
 export const GET_POST_DETAILS = defineAction('GET_POST_DETAILS')
 export const GET_LIKED_POSTS = defineAction('GET_LIKED_POSTS')
 export const CHANGE_LIKE_POST = defineAction('CHANGE_LIKE_POST')
+export const GENERATE_NEW_IMAGE = defineAction('GENERATE_NEW_IMAGE')
+export const CHECK_IMAGE_STATUS = defineAction('CHECK_IMAGE_STATUS')
 
 export const generateImage = (body) => (dispatch) => dispatch({
     type: GENERATE_IMAGE.ACTION,
@@ -60,4 +62,14 @@ export const getLikedPosts = () => (dispatch) => dispatch({
 export const likePost = (id, body) => (dispatch) => dispatch({
     type: CHANGE_LIKE_POST.ACTION,
     payload: postServices.likeImageRequest(id, body)
+})
+
+export const generateNewImage = (body) => (dispatch) => dispatch({
+    type: GENERATE_NEW_IMAGE.ACTION,
+    payload: postServices.generateNewImage(body)
+})
+
+export const checkImageStatus = (id) => (dispatch) => dispatch({
+    type: CHECK_IMAGE_STATUS.ACTION,
+    paylaod: postServices.checkNewImageStatus(id)
 })

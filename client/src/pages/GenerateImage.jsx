@@ -2,11 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types';
 import { LeftBar, ImageFromText } from '../components'
 import { ComingSoon } from './index';
-import { generateImage as generateImageAction, getAllPosts } from '../modules/post/actions' 
+import { generateImage as generateImageAction, generateNewImage, getAllPosts } from '../modules/post/actions' 
 import { useDispatch, useSelector } from 'react-redux';
 import { errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
 import { usePrevious } from '../hooks/use-previous';
 import LikedImages from '../components/LikedImages';
+import * as postServices from '../services/post'
 
 const Image = ({ src }) => {
     return (
@@ -32,13 +33,27 @@ const GenerateImage = () => {
     dispatch(getAllPosts())
   }, [dispatch])
 
+  const checkStatus = useCallback(async id => {
+    console.log('tentenado')
+    const response = await postServices.checkNewImageStatus(id)
+    console.log(response)
+
+    if (response?.data?.status === "processing") {
+      setTimeout(() => {
+        checkStatus(id)
+      }, 5000);
+    } else {
+      dispatch(getAllPosts())
+    }
+  }, [])
+
   useEffect(() => {
     if (!isLoadingGeneratePost && wasLoadingGeneratePost) {
       if (!errorGeneratePost && newPost) {
-        console.log(newPost)
+        checkStatus(newPost?._id)
       }
     }
-  }, [errorGeneratePost, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
+  }, [errorGeneratePost, checkStatus, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
 
   const options = [
     {
@@ -71,12 +86,12 @@ const GenerateImage = () => {
 
   const generateImage = useCallback(async (prompt) => {
     if (!prompt) return
-
+    
     const body = {
       prompt: prompt
     }
-    dispatch(generateImageAction(body))
-  }, [dispatch])
+    dispatch(generateNewImage(body))
+  }, [dispatch, generateNewImage])
 
   const selectedPage = useMemo(() => {
     if (selectedTab === 0) {

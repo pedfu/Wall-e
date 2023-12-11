@@ -13,18 +13,18 @@ const ImageFromText = ({ generateImage }) => {
   const error = useSelector(errorAllPostSelector)
   const isLoggedIn = useSelector(isLoggedSelector)
 
-  const [selectedIndex, setSelectedIndex] = useState(null)
+  const [selectedPostId, setSelectedPostId] = useState(null)
   const [text, setText] = useState('')
   const [modalPost, setModalPost] = useState(false)
 
   const newPost = useSelector(newPostSelector)
   const loadingNewPost = useSelector(loadingGeneratePostSelector)
 
-  const openDetails = useCallback((index) => {
-    setSelectedIndex(index)
+  const openDetails = useCallback((postId) => {
+    setSelectedPostId(postId)
   }, [])
   const closeDetails = useCallback(() => {
-    setSelectedIndex(null)
+    setSelectedPostId(null)
   }, [])
 
   const onChange = useCallback((e) => {
@@ -34,7 +34,7 @@ const ImageFromText = ({ generateImage }) => {
 
   const onGenerateClick = useCallback(() => {
     generateImage(text)
-    setModalPost(true)
+    // setModalPost(true)
   }, [generateImage, text])
 
   const onCreatePost = useCallback(text => {
@@ -49,8 +49,8 @@ const ImageFromText = ({ generateImage }) => {
   return (
     <>
       {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image} isLoading={loadingNewPost} />}
-      {selectedIndex !== null && (
-        <ModalDetails closeDetails={closeDetails} details={posts[selectedIndex]} />
+      {selectedPostId !== null && (
+        <ModalDetails closeDetails={closeDetails} details={posts.find(p => p._id === selectedPostId)} />
       )}
       <div className='w-full mb-2'>
           <textarea placeholder='A realistic photograph of a young guy with red hair in space' className='w-[calc(100%-48px)] h-24 mx-4 mt-3 focus:outline-none text-white p-2 bg-grey rounded-md resize-none' rows={4} value={text} onChange={onChange} />
@@ -60,8 +60,8 @@ const ImageFromText = ({ generateImage }) => {
         </div>
 
         <div className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'>
-          {!error ? posts.map((item, index) => (
-            <Card key={item.image} src={item.image} onClick={() => openDetails(index)} />
+          {!error ? [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((item, index) => (
+            <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
           )) : (
             <div className='flex w-full justify-center text-white mt-5'>
               {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}

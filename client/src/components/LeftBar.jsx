@@ -36,8 +36,8 @@ const LeftBar = ({ options, selectedTab, onTabSelect, expanded, setExpanded }) =
                 <img className='w-10 h-10 object-cover rounded-full' src={defaultProfile} />                
             </div>
             <div className={`flex-col items-center text-white ${expanded ? 'block' : 'hidden sm:block'} sm:block`}>
-                <h4 className='text-start'>{user.username}</h4>
-                <p className='text-sm text-fontGrey'>{user.email}</p>
+                <h4 className='text-start'>{user?.username}</h4>
+                <p className='text-sm text-fontGrey'>{user?.email}</p>
             </div>
         </div>
     </div>
