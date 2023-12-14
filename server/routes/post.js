@@ -1,43 +1,55 @@
 const express = require('express');
 const dotenv = require('dotenv')
 const Post = require('../mongodb/models/post.js');
-const User = require('../mongodb/models/user.js');
 const authenticate = require('../middlewares/auth.js')
-const AWS = require('aws-sdk')
-const { v4: uuidv4 } = require('uuid')
-const { client, GenerationStyle, Status } = require('imaginesdk')
 const { queue } = require('../queue.js')
 
 dotenv.config()
 
-AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_DEFAULT_REGION,
-});
-const s3 = new AWS.S3();
-
-const imagine = client(process.env.IMAGINEART_API_KEY);
-
 const router = express.Router()
 
 // get posts
-router.route('/').get(authenticate, async (req, res) => {    
-    await Post.find().then(posts => {
-        res.status(200).send(posts)
-    })
+router.route('/').get(authenticate, async (req, res) => {
+    const page = parseInt(req.query.page) || 1
+    const pageSize = parseInt(req.query.pageSize) || 20
+
+    const allPosts = await Post.find().skip((page - 1) * pageSize).limit(pageSize)
+    const totalCount = await Post.countDocuments()
+    
+    const nextPage = (page * pageSize < totalCount) ? page + 1 : null
+    res.status(200).json({ posts: allPosts, totalCount, nextPage })
+})
+
+// get user posts
+router.route('/my-posts').get(authenticate, async (req, res) => {
+    const { user } = req
+    const page = parseInt(req.query.page) || 1
+    const pageSize = parseInt(req.query.pageSize) || 20
+
+    const allPosts = await Post.find({ 'createdBy.userId': user._id }).skip((page - 1) * pageSize).limit(pageSize)
+    const totalCount = await Post.countDocuments()
+    
+    const nextPage = (page * pageSize < totalCount) ? page + 1 : null
+    res.status(200).json({ posts: allPosts, totalCount, nextPage })
 })
 
 // get liked posts
-router.route('/liked').get(authenticate, async (req, res) => {    
-    await Post.find({ 'likes.userId': req.user._id.toString() }).then(posts => {
-        res.status(200).send(posts)
-    })
+router.route('/liked').get(authenticate, async (req, res) => {
+    const { user } = req
+    const page = parseInt(req.query.page) || 1
+    const pageSize = parseInt(req.query.pageSize) || 20
+
+    const allPosts = await Post.find({ 'likes.userId': user._id.toString() }).skip((page - 1) * pageSize).limit(pageSize)
+    const totalCount = await Post.countDocuments()
+    
+    const nextPage = (page * pageSize < totalCount) ? page + 1 : null
+    res.status(200).json({ posts: allPosts, totalCount, nextPage })
 })
 
 // get post
 router.route('/:id').get(authenticate, async (req, res) => {
     const { id } = req.params
+    if (!id || id === 'undefined') return 
     await Post.findOne({ _id: id }).then(post => {
         res.status(200).send(post)
     })
@@ -77,14 +89,17 @@ router.route('/:id/like').post(authenticate, async (req, res) => {
     const { user } = req
 
     await Post.findOne({ _id: id }).then(post => {
+        let liked;
         if (post.likes.some(x => x.userId === user._id.toString())) {
             post.likes = post.likes.filter(x => x.userId !== user._id.toString());
+            liked = false
         } else {
             post.likes.push({ userId: user._id });
+            liked = true
         }    
 
         post.save()
-        res.status(200).send(post)
+        res.status(200).send({...post._doc, liked})
     })
 })
 
@@ -157,94 +172,6 @@ router.route('/add-image').post(authenticate, async (req, res) => {
     } catch (error) {
         console.log(error)
         res.status(400).send(error)
-    }
-})
-
-// generate image
-router.route('/').post(authenticate, async (req, res) => {
-    const { prompt } = req.body
-    const { user } = req
-    if (!prompt || !user) {
-        return res.status(400)
-            .json({ error: 'Prompt or creator data missing.' })
-    }
-    
-    try {
-        // if ip or email already have 10 pictures generated this month, return error
-        const combinedQuery = {
-            $or: [
-              { email: user.email },
-              { ipAddress: user.ipAddress }
-            ]
-        };
-        const result = await User.find(combinedQuery);
-        if (result.some(u => u.monthCount >= 10)) {
-            return res.status(400).json({ message: 'You have reached the max count for this month' })
-        }
-
-         // request for ai art generator
-         const response = await imagine.generations(
-            `${prompt}`,
-            {
-                style: GenerationStyle.IMAGINE_V5,
-            }
-        );
-        const image = response.data().base64()
-
-        const imageId = uuidv4()
-
-        // save image in aws
-        const buffer = Buffer.from(image, 'base64')
-        const params = {
-            Bucket: 'pedrofamouspersons-images',
-            Key: `ai-images/${imageId}`,
-            Body: buffer,
-            ContentType: 'image/png',
-            ACL: 'public-read'
-        }
-        await s3.upload(params).promise()
-        
-        // create post
-        const post = new Post({
-            description: '',
-            image: `https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/${imageId}`,
-            createdBy: {
-                userId: user._id,
-                username: user.username
-            },
-            prompt,
-            isPublic: false,
-            likes: [],
-            comments: []
-        })
-        
-        user.monthCount = user.monthCount + 1
-        await user.save()
-        await post.save()
-        return res.status(201).send(post)
-    } catch (error) {
-        return res.status(400)
-            .json({ error: 'Something went wrong while creating your image.', details: error })
-    }
-})
-
-// create post
-router.route('/:id/create-post').put(authenticate, async (req, res) => {
-    const { id } = req.params
-    const { description, isPublic } = req.body
-    const { user } = req
-
-    try {
-        Post.findByIdAndUpdate(id, { description: description, isPublic: isPublic || true }, (err, docs) => {
-            if (err) {
-                res.status(404).json({ error: 'Post not found.' })
-            } else {
-                res.status(200).send(docs)
-            }
-        }) 
-    } catch (error) {
-        return res.status(400)
-            .json({ error: 'Something went wrong while creating your post.', details: error })
     }
 })
 

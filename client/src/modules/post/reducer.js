@@ -1,66 +1,73 @@
 import { createReducer } from "../../utils/redux";
-import { COMMENT_ON_IMAGE, GENERATE_IMAGE, GET_ALL_IMAGES, GET_COMMENTS, GET_IMAGE, LIKE_IMAGE, PUBLIC_IMAGE, GET_POST_DETAILS, CHANGE_LIKE_POST, GET_LIKED_POSTS, GENERATE_NEW_IMAGE } from "./actions";
+import { COMMENT_ON_IMAGE, GET_ALL_IMAGES, LIKE_IMAGE, GET_IMAGE_DETAILS, CHANGE_LIKE_IMAGE, GET_LIKED_IMAGES, GENERATE_NEW_IMAGE, GET_USER_IMAGES } from "./actions";
 
 const INITIAL_STATE = {
-    posts: [],
-    likedPosts: null,
-    post: {},
-    newPost: {},
-    postDetails: {},
+    newImage: {},
+    imageDetails: {},
+    allImages: {
+        totalCount: 0,
+        nextPage: 0,
+        images: [],
+    },
+    likedImages: {
+        totalCount: 0,
+        nextPage: 0,
+        images: [],
+    },
+    userImages: {
+        totalCount: 0,
+        nextPage: 0,
+        images: [],
+    }
 }
 
 export default createReducer(INITIAL_STATE, {
-    [GENERATE_IMAGE.FULFILLED]: (state, action) => {
-        const newPosts = [...state.posts, action.payload.data]
-        return { ...state, newPost: action.payload.data, posts : newPosts }
-    },
     [GENERATE_NEW_IMAGE.FULFILLED]: (state, action) => {
-        const newPosts = [...state.posts, action.payload.data]
-        return { ...state, newPost: action.payload.data, posts : newPosts }
-    },
-    [PUBLIC_IMAGE.FULFILLED]: (state, action) => {
-        const newPosts = state.posts?.map(x => {
-            if (x._id === action.payload.data._id) return action.payload.data
-            else return x
-        })
-        return { ...state, posts: newPosts }
+        const newImages = [...state.userImages.images, action.payload.data]
+        return { ...state, newImage: action.payload.data, userImages: { ...state.userImages, images: newImages }}
     },
     [LIKE_IMAGE.FULFILLED]: (state, action) => {
-        const newPosts = state.posts?.map(x => {
-            if (x._id === action.payload.data._id) return action.payload.data
-            else return x
-        })
-        return { ...state, posts: newPosts }
+        const likedImage = action.payload.data;
+
+        const allImagesIndex = state.allImages.images?.findIndex(x => x._id === likedImage._id);
+        const updatedAllImages = [...state.allImages.images];
+        if (allImagesIndex >= 0) updatedAllImages[allImagesIndex] = likedImage;
+
+        const userImagesIndex = state.userImages.images?.findIndex(x => x._id === likedImage._id);
+        const updatedUserImages = [...state.userImages.images];
+        if (userImagesIndex >= 0) updatedUserImages[userImagesIndex] = likedImage;
+
+        const updatedLikedImages = likedImage.liked
+            ? [...state.likedImages.images, likedImage]
+            : state.likedImages.images.filter(x => x._id !== likedImage._id);
+
+        return {
+            ...state,
+            allImages: { ...state.allImages, images: updatedAllImages },
+            userImages: { ...state.userImages, images: updatedUserImages },
+            likedImages: { ...state.likedImages, images: updatedLikedImages },
+            imageDetails: state.imageDetails._id === likedImage._id ? likedImage : state.imageDetails
+        };
     },
     [COMMENT_ON_IMAGE.FULFILLED]: (state, action) => {
-        const newPosts = state.posts?.map(x => {
-            if (x._id === action.payload.data._id) return action.payload.data
-            else return x
-        })
-        return { ...state, posts: newPosts, postDetails: action.payload.data }
+        return { ...state, imageDetails: action.payload.data }
     },
-    [GET_COMMENTS.FULFILLED]: (state, action) => {
-        const newPost = state.post
-        newPost.comments = action.payload.data
-        return { ...state, post: newPost }
-    },
-    [GET_IMAGE.FULFILLED]: (state, action) => {
-        const newPosts = state.posts?.map(x => {
-            if (x._id === action.payload.data._id) return action.payload.data
-            else return x
-        })
-        return { ...state, posts: newPosts, post: action.payload.data }
-    },
-    [GET_POST_DETAILS.FULFILLED]: (state, action) => {
-        return { ...state, postDetails: action.payload.data }
+    [GET_IMAGE_DETAILS.FULFILLED]: (state, action) => {
+        return { ...state, imageDetails: action.payload.data }
     },
     [GET_ALL_IMAGES.FULFILLED]: (state, action) => {
-        return { ...state, posts: action.payload.data }
+        const { totalCount, nextPage, posts } = action.payload.data
+        return { ...state, allImages: { images: posts, totalCount, nextPage }}
     },
-    [CHANGE_LIKE_POST.FULFILLED]: (state, action) => {
-        return { ...state, postDetails: action.payload.data }
+    [CHANGE_LIKE_IMAGE.FULFILLED]: (state, action) => {
+        return { ...state, imageDetails: action.payload.data }
     },
-    [GET_LIKED_POSTS.FULFILLED]: (state, action) => {
-        return { ...state, likedPosts: action.payload.data }
+    [GET_LIKED_IMAGES.FULFILLED]: (state, action) => {
+        const { totalCount, nextPage, posts } = action.payload.data
+        return { ...state, likedImages: { images: posts, totalCount, nextPage } }
+    },
+    [GET_USER_IMAGES.FULFILLED]: (state, action) => {
+        const { totalCount, nextPage, posts } = action.payload.data
+        return { ...state, userImages: { images: posts, totalCount, nextPage }}
     }
 })

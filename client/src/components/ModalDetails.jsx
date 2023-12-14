@@ -1,35 +1,33 @@
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { loadingPostDetailsSelector, postDetailsSelector } from '../modules/post/selector'
-// import { usePrevious } from '../hooks/use-previous';
-import { commentOnImage, getPostDetails, likePost } from '../modules/post/actions'
+import { loadingImageDetailsSelector, imageDetailsSelector } from '../modules/post/selector'
+import { commentOnImage, getImageDetails, likeImage } from '../modules/post/actions'
 import { userSelector } from '../modules/authentication/selector';
 
-const ModalDetails = ({ details, closeDetails }) => {
+const ModalDetails = ({ imageId, closeDetails }) => {
   const dispatch = useDispatch()
   const [comment, setComment] = useState('')
 
   const user = useSelector(userSelector)
-  const postDetails = useSelector(postDetailsSelector)
-  const isPostDetailsLoading = useSelector(loadingPostDetailsSelector)
-  // const wasPostDetailsLoading = usePrevious(isPostDetailsLoading)
+  const imageDetails = useSelector(imageDetailsSelector)
+  const isImageDetailsLoading = useSelector(loadingImageDetailsSelector)
 
   useEffect(() => {
-    dispatch(getPostDetails(details._id))
-  }, [details._id, dispatch])
+    dispatch(getImageDetails(imageId))
+  }, [imageId, dispatch])
 
   const handleComment = useCallback(() => {
     if (!comment) return
 
     // send new comment
-    dispatch(commentOnImage(details?._id, { comment }))
+    dispatch(commentOnImage(imageId, { comment }))
     setComment('')
-  }, [comment, details?._id, dispatch])
+  }, [comment, imageId, dispatch])
 
   const handleLike = useCallback(() => {
-    dispatch(likePost(details?._id, {}))
-  }, [details?._id, dispatch])
+    dispatch(likeImage(imageId, {}))
+  }, [imageId, dispatch])
 
   const onChange = useCallback(event => {
     const { value } = event.target
@@ -38,7 +36,7 @@ const ModalDetails = ({ details, closeDetails }) => {
 
   const renderLike = useMemo(() => {
     if (!user) return
-    if (postDetails.likes?.some(x => x.userId === user._id.toString())) {
+    if (imageDetails.likes?.some(x => x.userId === user._id.toString())) {
       return (
         <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z" fill="#FF0000"/>
@@ -51,13 +49,13 @@ const ModalDetails = ({ details, closeDetails }) => {
         <path className='hover:fill-red' fillRule="evenodd" clipRule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     )
-  }, [postDetails, user])
+  }, [imageDetails, user])
 
-  if (isPostDetailsLoading) {
+  if (isImageDetailsLoading) {
     return 'loading'
   }
 
-  if (!postDetails) {
+  if (!imageDetails) {
     return 'nada'
   }
 
@@ -73,18 +71,18 @@ const ModalDetails = ({ details, closeDetails }) => {
             </div>
 
             <div className='px-4 w-[calc(100%-300px)] flex items-center'>
-                <img className='' src={postDetails?.image} />
+                <img className='' src={imageDetails?.image} />
             </div>
 
             <div className='w-[300px] h-[560px] text-fontGrey flex items-start flex-col justify-between'>
               <div className='pr-2 max-h-[calc(560px-110px)]'>
                 <p className='text-white mb-2 mt-8'>Prompt</p>
-                <p className='text-center bg-grey rounded-md p-1'>{postDetails?.prompt}</p>
+                <p className='text-center bg-grey rounded-md p-1'>{imageDetails?.prompt}</p>
 
                 <div className='w-full mt-3 text-white max-h-[calc(560px-235px)] overflow-y-auto'>
                   <h4 className='mb-2'>Comments</h4>
                   <div>
-                    {postDetails.comments?.map((c, index) => (
+                    {imageDetails.comments?.map((c, index) => (
                       <div key={`${c.createdBy.username}-${index}`} className='flex items-center my-2'>
                         <p className='font-medium text-sm mr-2 text-fontGrey'>{c.createdBy.username}</p>
                         <p className='text-sm font-light'>{c.comment}</p>
@@ -116,21 +114,7 @@ const ModalDetails = ({ details, closeDetails }) => {
 }
 
 ModalDetails.propTypes = {
-  details: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    prompt: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-    comments: PropTypes.arrayOf(PropTypes.shape({
-      createdBy: PropTypes.shape({
-        userId: PropTypes.string.isRequired,
-        username: PropTypes.string.isRequired,
-      }),
-      comment: PropTypes.string.isRequired,
-    })),
-    likes: PropTypes.arrayOf(PropTypes.shape({
-      userId: PropTypes.string.isRequired,
-    })),
-  }),
+  imageId: PropTypes.string.isRequired,
   closeDetails: PropTypes.func.isRequired
 }
 

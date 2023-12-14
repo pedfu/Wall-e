@@ -1,20 +1,16 @@
 import { get, post } from "./request";
 
-export const generateImageRequest = (prompt) => post('/post', {}, prompt)
-
-export const publicImageRequest = (id, body) => post(`/post/${id}/create-post`, {}, body)
-
 export const likeImageRequest = (id, body) => post(`/post/${id}/like`, {}, body)
 
 export const commentOnImageRequest = (id, body) => post(`/post/${id}/comment`, {}, body)
 
-export const getCommentsFromImageRequest = (id) => get(`/post/${id}/comments`, {})
+export const getUserImagesRequest = (nextPage, pageSize) => get(`/post/my-posts?page=${nextPage}&pageSize=${pageSize}`, {}, null)
 
 export const getImageRequest = (id) => get(`/post/${id}`, {}, null)
 
-export const getAllImageRequest = () => get(`/post`, {}, null)
+export const getAllImageRequest = (nextPage, pageSize) => get(`/post?page=${nextPage}&pageSize=${pageSize}`, {}, null)
 
-export const getLikedPostsRequest = () => get(`/post/liked`, {}, null)
+export const getLikedImagesRequest = () => get(`/post/liked`, {}, null)
 
 // { prompt: '' }
 export const generateNewImage = (body) => post('/post/add-image', {}, body)

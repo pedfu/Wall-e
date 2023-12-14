@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types';
 import { LeftBar, ImageFromText } from '../components'
 import { ComingSoon } from './index';
-import { generateImage as generateImageAction, generateNewImage, getAllPosts } from '../modules/post/actions' 
+import { generateNewImage, getUserImages } from '../modules/post/actions' 
 import { useDispatch, useSelector } from 'react-redux';
-import { errorGeneratePostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector';
+import { errorGenerateImageSelector, loadingGenerateImageSelector, newImageSelector, userImagesSelector } from '../modules/post/selector';
 import { usePrevious } from '../hooks/use-previous';
 import LikedImages from '../components/LikedImages';
 import * as postServices from '../services/post'
+import CommunityImages from '../components/CommunityImages';
 
 const Image = ({ src }) => {
     return (
@@ -21,16 +22,17 @@ Image.propTypes = {
 
 const GenerateImage = () => {
   const dispatch = useDispatch()
-  const isLoadingGeneratePost = useSelector(loadingGeneratePostSelector)
+  const isLoadingGeneratePost = useSelector(loadingGenerateImageSelector)
   const wasLoadingGeneratePost = usePrevious(isLoadingGeneratePost)
-  const errorGeneratePost = useSelector(errorGeneratePostSelector)
-  const newPost = useSelector(newPostSelector)
+  const errorGeneratePost = useSelector(errorGenerateImageSelector)
+  const newPost = useSelector(newImageSelector)
+  const userPosts = useSelector(userImagesSelector)
 
   const [selectedTab, setSelectedTab] = useState(0)
   const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
-    dispatch(getAllPosts())
+    dispatch(getUserImages())
   }, [dispatch])
 
   const checkStatus = useCallback(async id => {
@@ -40,7 +42,7 @@ const GenerateImage = () => {
         checkStatus(id)
       }, 5000);
     } else {
-      dispatch(getAllPosts())
+      dispatch(getUserImages())
     }
   }, [])
 
@@ -59,6 +61,13 @@ const GenerateImage = () => {
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
       </svg>
       
+    },
+    {
+        text: 'Community images',
+        icon: <svg className='w-6 h-6' viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.75 12C2.75 9.10051 5.10051 6.75 8 6.75C8.41421 6.75 8.75 6.41421 8.75 6C8.75 5.58579 8.41421 5.25 8 5.25C4.27208 5.25 1.25 8.27208 1.25 12C1.25 15.7279 4.27208 18.75 8 18.75C11.7279 18.75 14.75 15.7279 14.75 12C14.75 11.5858 14.4142 11.25 14 11.25C13.5858 11.25 13.25 11.5858 13.25 12C13.25 14.8995 10.8995 17.25 8 17.25C5.10051 17.25 2.75 14.8995 2.75 12Z" fill="#EAEAEA"/>
+        <path d="M21.25 12C21.25 14.8995 18.8995 17.25 16 17.25C15.5858 17.25 15.25 17.5858 15.25 18C15.25 18.4142 15.5858 18.75 16 18.75C19.7279 18.75 22.75 15.7279 22.75 12C22.75 8.27208 19.7279 5.25 16 5.25C12.2721 5.25 9.25 8.27208 9.25 12C9.25 12.4142 9.58579 12.75 10 12.75C10.4142 12.75 10.75 12.4142 10.75 12C10.75 9.1005 13.1005 6.75 16 6.75C18.8995 6.75 21.25 9.1005 21.25 12Z" fill="#EAEAEA"/>
+        </svg>
     },
     {
         text: 'Liked images',
@@ -94,6 +103,8 @@ const GenerateImage = () => {
     if (selectedTab === 0) {
       return <ImageFromText generateImage={generateImage} />
     } else if (selectedTab === 1) {
+      return <CommunityImages />
+    } else if (selectedTab === 2) {
       return <LikedImages />
     } else {
       return <ComingSoon />

@@ -3,14 +3,14 @@ import PropTypes from 'prop-types'
 import Modal from './Modal'
 import Button from './Button'
 import { useSelector } from 'react-redux'
-import { loadingPostSelector, newPostSelector } from '../modules/post/selector'
+import { loadingImageDetailsSelector, newImageSelector } from '../modules/post/selector'
 import { usePrevious } from '../hooks/use-previous'
 
 const ModalPost = ({ onSubmit, onClose, prompt, isLoading }) => {
     const [text, setText] = useState('')
     const [image, setImage] = useState('')
-    const newPost = useSelector(newPostSelector)
-    const isGeneratingLoading = useSelector(loadingPostSelector)
+    const newImage = useSelector(newImageSelector)
+    const isGeneratingLoading = useSelector(loadingImageDetailsSelector) // POSSIBLI WRONG LOADING SELECTOR -> ADD IMAGE + CHECK STATUS MIGHT BE THE CORRECT ONE
     const wasGeneratingLoading = usePrevious(isGeneratingLoading)
 
     const onTextChange = useCallback(event => {
@@ -21,12 +21,12 @@ const ModalPost = ({ onSubmit, onClose, prompt, isLoading }) => {
     useEffect(() => {
         if (!isGeneratingLoading && wasGeneratingLoading) {
             if (!error) {
-                setImage(newPost.image)
+                setImage(newImage.image)
             } else {
                 setImage(null)
             }
         }
-    }, [isGeneratingLoading, wasGeneratingLoading, newPost])
+    }, [isGeneratingLoading, wasGeneratingLoading, newImage])
 
   return (
     <Modal onClose={() => onClose()} className='bg-darkGrey rounded-xl min-w-[600px] max-w-[1000px] text-white'>

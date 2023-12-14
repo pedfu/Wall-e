@@ -3,22 +3,22 @@ import PropTypes from 'prop-types'
 import { Card, ModalDetails } from '.'
 import ModalPost from './ModalPost'
 import { useDispatch, useSelector } from 'react-redux'
-import { allPostSelector, errorAllPostSelector, loadingGeneratePostSelector, newPostSelector } from '../modules/post/selector'
+import { errorUserImagesSelector, loadingUserImagesSelector, newImageSelector, userImagesSelector } from '../modules/post/selector'
 import { isLoggedSelector } from '../modules/authentication/selector'
 import { publicImage } from '../modules/post/actions'
 
 const ImageFromText = ({ generateImage }) => {
   const dispatch = useDispatch()
-  const posts = useSelector(allPostSelector)
-  const error = useSelector(errorAllPostSelector)
+  const userPosts = useSelector(userImagesSelector)
+  const error = useSelector(errorUserImagesSelector)
   const isLoggedIn = useSelector(isLoggedSelector)
 
   const [selectedPostId, setSelectedPostId] = useState(null)
   const [text, setText] = useState('')
   const [modalPost, setModalPost] = useState(false)
 
-  const newPost = useSelector(newPostSelector)
-  const loadingNewPost = useSelector(loadingGeneratePostSelector)
+  const newImage = useSelector(newImageSelector)
+  const loadingNewImage = useSelector(loadingUserImagesSelector) // MIGHT BE WRONG
 
   const openDetails = useCallback((postId) => {
     setSelectedPostId(postId)
@@ -38,7 +38,7 @@ const ImageFromText = ({ generateImage }) => {
   }, [generateImage, text])
 
   const onCreatePost = useCallback(text => {
-    dispatch(publicImage(newPost._id, { description: text, isPublic: true }))
+    dispatch(publicImage(newImage._id, { description: text, isPublic: true }))
     setModalPost(false)
   }, [])
 
@@ -48,9 +48,9 @@ const ImageFromText = ({ generateImage }) => {
 
   return (
     <>
-      {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newPost?.image} isLoading={loadingNewPost} />}
+      {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newImage?.image} isLoading={loadingNewImage} />}
       {selectedPostId !== null && (
-        <ModalDetails closeDetails={closeDetails} details={posts.find(p => p._id === selectedPostId)} />
+        <ModalDetails closeDetails={closeDetails} details={userPosts.images.find(p => p._id === selectedPostId)} />
       )}
       <div className='w-full mb-2'>
           <textarea placeholder='A realistic photograph of a young guy with red hair in space' className='w-[calc(100%-48px)] h-24 mx-4 mt-3 focus:outline-none text-white p-2 bg-grey rounded-md resize-none' rows={4} value={text} onChange={onChange} />
@@ -60,7 +60,7 @@ const ImageFromText = ({ generateImage }) => {
         </div>
 
         <div className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'>
-          {!error ? [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((item, index) => (
+          {!error ? [...userPosts.images].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((item, index) => (
             <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
           )) : (
             <div className='flex w-full justify-center text-white mt-5'>
