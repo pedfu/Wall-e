@@ -13,12 +13,10 @@ const useListPagination = (action, actionName, params) => {
     const wasLoading = usePrevious(loading)
 
     const refresh = useCallback(() => {
-        console.log('teste2')
         dispatch(action(params))
     }, [dispatch, action, params])
 
     useEffect(() => {
-        console.log('teste')
         refresh()
     }, [params])
 
@@ -31,13 +29,11 @@ const useListPagination = (action, actionName, params) => {
     }, [loading, wasLoading, error, dispatch])
 
     const previousPage = useCallback(() => {
-        console.log('teste3')
         dispatch(action({ ...params, page: currentPage - 1 }))
         setCurrentPage(prevState => prevState - 1)
     }, [action, currentPage, params, dispatch])
 
     const nextPage = useCallback(() => {
-        console.log('teste4')
         dispatch(action({ ...params, page: currentPage + 1 }))
         setCurrentPage(prevState => prevState + 1)
     }, [action, currentPage, params, dispatch])

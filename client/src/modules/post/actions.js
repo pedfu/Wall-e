@@ -32,14 +32,14 @@ export const getImageDetails = (id) => (dispatch) => dispatch({
     payload: postServices.getImageRequest(id)
 })
 
-export const getUserImages = (nextPage, pageSize) => (dispatch) => dispatch({
+export const getUserImages = (params) => (dispatch) => dispatch({
     type: GET_USER_IMAGES.ACTION,
-    payload: postServices.getUserImagesRequest(nextPage || 1, pageSize || 20)
+    payload: postServices.getUserImagesRequest(params.page, params.pageSize)
 })
 
-export const getAllImages = (nextPage, pageSize) => (dispatch) => dispatch({
+export const getAllImages = (params) => (dispatch) => dispatch({
     type: GET_ALL_IMAGES.ACTION,
-    payload: postServices.getAllImageRequest(nextPage || 1, pageSize || 20)
+    payload: postServices.getAllImageRequest(params.page, params.pageSize)
 })
 
 export const getLikedImages = () => (dispatch) => dispatch({

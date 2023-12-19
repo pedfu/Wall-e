@@ -3,43 +3,53 @@ import { Card, Loader, ModalDetails } from '.'
 import { useDispatch, useSelector } from 'react-redux'
 import { allImagesSelector, errorAllImageSelector, loadingAllImageSelector } from '../modules/post/selector'
 import { isLoggedSelector } from '../modules/authentication/selector'
-import { getAllImages } from '../modules/post/actions'
+import { GET_ALL_IMAGES, getAllImages } from '../modules/post/actions'
 import { usePrevious } from '../hooks/use-previous'
 import InfiniteScroll from 'react-infinite-scroller'
+import Pagination from './pagination'
+import useListPagination from '../hooks/use-list-pagination'
 
 const INITIAL_STATE = {
   totalCount: 0,
   page: 1,
-  pageSize: 20
+  pageSize: 20,
+  params: {}
 }
 
 const CommunityImages = () => {
-  const dispatch = useDispatch()
   const allImages = useSelector(allImagesSelector)
   const error = useSelector(errorAllImageSelector)
-  const isLoading = useSelector(loadingAllImageSelector)
-  const wasLoading = usePrevious(isLoading)
   const isLoggedIn = useSelector(isLoggedSelector)
 
   const [state, setState] = useState(INITIAL_STATE)
   const [selectedPostId, setSelectedPostId] = useState(null)
 
-  const fetchNextItems = useCallback(() => {
-    if (isLoading) return
+  const { currentPage, loading, nextPage, previousPage, refresh, resetCurrentPage, setCurrentPage} = useListPagination(getAllImages, GET_ALL_IMAGES, state.params)
 
-    dispatch(getAllImages(allImages.nextPage || 1, state.pageSize))
-  }, [state.pageSize, allImages.nextPage, isLoading, dispatch])
+  // const fetchNextItems = useCallback(() => {
+  //   if (isLoading) return
 
-  useEffect(() => {
-    fetchNextItems()
-  }, [])
+  //   dispatch(getAllImages(allImages.nextPage || 1, state.pageSize))
+  // }, [state.pageSize, allImages.nextPage, isLoading, dispatch])
 
-  useEffect(() => {
-    setState({
-      totalCount: allImages.totalCount,
-      page: allImages.page || 1
-    })
-  }, [allImages])
+  // useEffect(() => {
+  //   fetchNextItems()
+  // }, [])
+
+  // useEffect(() => {
+  //   setState({
+  //     totalCount: allImages.totalCount,
+  //     page: allImages.page || 1
+  //   })
+  // }, [allImages])
+
+  const onChangePage = useCallback((event) => {
+    const { name, value } = event.target
+    setState(prevState => ({
+      ...prevState,
+      [name]: value
+    }))
+  })
 
   const openDetails = useCallback((postId) => {
     setSelectedPostId(postId)
@@ -56,16 +66,22 @@ const CommunityImages = () => {
       )}
       {!error ? 
         (
-          <InfiniteScroll
-            className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'
-            loadMore={fetchNextItems}
-            hasMore={state.pageSize * allImages.page < state.totalCount}
-            loader={<Loader />}
+          <Pagination
+            totalQnt={allImages.totalCount}
+            listSize={allImages.images?.length}
+            pageSize={state.pageSize}
+            onChangePageSize={onChangePage}
+            nextPage={nextPage}
+            previousPage={previousPage}
+            currentPage={currentPage}
+            isLoading={loading}
           >
-            {allImages.images.map((item, index) => (
-              <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
-            ))}
-          </InfiniteScroll>
+            <div className='flex justify-center w-full flex-wrap'>
+              {allImages.images.map((item, index) => (
+                <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
+              ))}
+            </div>
+          </Pagination>
         ) : (
         <div className='flex w-full justify-center text-white mt-5'>
           {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}

@@ -31,10 +31,6 @@ const ImageFromText = ({ generateImage }) => {
 
   const { currentPage, loading, nextPage, previousPage, refresh, resetCurrentPage, setCurrentPage } = useListPagination(getUserImages, GET_USER_IMAGES, state.params)
 
-  useEffect(() => {
-    // refresh()
-  }, [])
-
   const openDetails = useCallback((postId) => {
     setSelectedPostId(postId)
   }, [])
@@ -68,8 +64,6 @@ const ImageFromText = ({ generateImage }) => {
       [name]: value
     }))
   })
-
-  console.log(userPosts.images)
 
   return (
     <>
