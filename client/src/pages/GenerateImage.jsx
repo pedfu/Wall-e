@@ -31,10 +31,6 @@ const GenerateImage = () => {
   const [selectedTab, setSelectedTab] = useState(0)
   const [expanded, setExpanded] = useState(false)
 
-  useEffect(() => {
-    dispatch(getUserImages())
-  }, [dispatch])
-
   const checkStatus = useCallback(async id => {
     const response = await postServices.checkNewImageStatus(id)
     if (response?.data?.status === "processing") {

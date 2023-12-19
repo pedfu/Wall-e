@@ -27,7 +27,7 @@ router.route('/my-posts').get(authenticate, async (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 20
 
     const allPosts = await Post.find({ 'createdBy.userId': user._id }).skip((page - 1) * pageSize).limit(pageSize)
-    const totalCount = await Post.countDocuments()
+    const totalCount = await Post.countDocuments({ 'createdBy.userId': user._id });
     
     const nextPage = (page * pageSize < totalCount) ? page + 1 : null
     res.status(200).json({ posts: allPosts, totalCount, nextPage })

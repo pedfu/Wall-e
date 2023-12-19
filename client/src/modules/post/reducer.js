@@ -53,21 +53,29 @@ export default createReducer(INITIAL_STATE, {
         return { ...state, imageDetails: action.payload.data }
     },
     [GET_IMAGE_DETAILS.FULFILLED]: (state, action) => {
+        console.log(action.payload.data)
         return { ...state, imageDetails: action.payload.data }
     },
     [GET_ALL_IMAGES.FULFILLED]: (state, action) => {
         const { totalCount, nextPage, posts } = action.payload.data
-        return { ...state, allImages: { images: posts, totalCount, nextPage }}
+        const uniquePosts = posts.filter(post => !state.allImages.images.some(existingPost => existingPost._id === post._id));
+        const images = nextPage > 1 ? [...state.allImages.images, ...uniquePosts] : uniquePosts;
+        return { ...state, allImages: { images, totalCount, nextPage }};
     },
     [CHANGE_LIKE_IMAGE.FULFILLED]: (state, action) => {
         return { ...state, imageDetails: action.payload.data }
     },
     [GET_LIKED_IMAGES.FULFILLED]: (state, action) => {
         const { totalCount, nextPage, posts } = action.payload.data
-        return { ...state, likedImages: { images: posts, totalCount, nextPage } }
+        const uniquePosts = posts.filter(post => !state.likedImages.images.some(existingPost => existingPost._id === post._id));
+        const images = nextPage > 1 ? [...state.likedImages.images, ...uniquePosts] : uniquePosts;
+        return { ...state, likedImages: { images, totalCount, nextPage }};
     },
     [GET_USER_IMAGES.FULFILLED]: (state, action) => {
         const { totalCount, nextPage, posts } = action.payload.data
-        return { ...state, userImages: { images: posts, totalCount, nextPage }}
+        // const uniquePosts = posts.filter(post => !state.userImages.images.some(existingPost => existingPost._id === post._id));
+        // const images = nextPage > 1 ? [...state.userImages.images, ...uniquePosts] : uniquePosts;
+        
+        return { ...state, userImages: { images: posts, totalCount, nextPage }};
     }
 })

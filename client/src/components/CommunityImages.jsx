@@ -26,7 +26,6 @@ const CommunityImages = () => {
 
   const fetchNextItems = useCallback(() => {
     if (isLoading) return
-    if (!allImages.nextPage) return
 
     dispatch(getAllImages(allImages.nextPage || 1, state.pageSize))
   }, [state.pageSize, allImages.nextPage, isLoading, dispatch])
@@ -34,6 +33,13 @@ const CommunityImages = () => {
   useEffect(() => {
     fetchNextItems()
   }, [])
+
+  useEffect(() => {
+    setState({
+      totalCount: allImages.totalCount,
+      page: allImages.page || 1
+    })
+  }, [allImages])
 
   const openDetails = useCallback((postId) => {
     setSelectedPostId(postId)
@@ -46,26 +52,25 @@ const CommunityImages = () => {
   return (
     <>
       {selectedPostId !== null && (
-        <ModalDetails closeDetails={closeDetails} details={posts.find(p => p._id === selectedPostId)} />
+        <ModalDetails closeDetails={closeDetails} imageId={selectedPostId} />
       )}
-      <div className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'>
-        {!error ? 
-          (
-            <InfiniteScroll
-              loadMore={fetchNextItems}
-              hasMore={state.pageSize * state.page < state.totalCount}
-              loader={<Loader />}
-            >
-              {allImages.images.map((item, index) => (
-                <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
-              ))}
-            </InfiniteScroll>
-          ) : (
-          <div className='flex w-full justify-center text-white mt-5'>
-            {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}
-          </div>
-        )}
-      </div>
+      {!error ? 
+        (
+          <InfiniteScroll
+            className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'
+            loadMore={fetchNextItems}
+            hasMore={state.pageSize * allImages.page < state.totalCount}
+            loader={<Loader />}
+          >
+            {allImages.images.map((item, index) => (
+              <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
+            ))}
+          </InfiniteScroll>
+        ) : (
+        <div className='flex w-full justify-center text-white mt-5'>
+          {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}
+        </div>
+      )}
     </>
   )
 }
