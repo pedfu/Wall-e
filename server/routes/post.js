@@ -151,9 +151,9 @@ router.route('/add-image').post(authenticate, async (req, res) => {
         ])
         const totalPosts = resultTotalPosts[0].postCount
         console.log('Total number of posts across all users in the current month:', totalPosts)
-        // if (totalPosts >= 20) {
-        //     return res.status(400).json({ message: 'You have reached the max count for this month' })
-        // }
+        if (totalPosts >= 20) {
+            return res.status(400).json({ message: 'You have reached the max count for this month' })
+        }
 
         const post = new Post({
             description: '',
