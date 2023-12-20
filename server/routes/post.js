@@ -26,7 +26,7 @@ router.route('/my-posts').get(authenticate, async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const pageSize = parseInt(req.query.pageSize) || 20
 
-    const allPosts = await Post.find({ 'createdBy.userId': user._id }).skip((page - 1) * pageSize).limit(pageSize)
+    const allPosts = await Post.find({ 'createdBy.userId': user._id }).sort({ createdAt: -1 }).skip((page - 1) * pageSize).limit(pageSize)
     const totalCount = await Post.countDocuments({ 'createdBy.userId': user._id });
     
     const nextPage = (page * pageSize < totalCount) ? page + 1 : null
@@ -40,7 +40,7 @@ router.route('/liked').get(authenticate, async (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 20
 
     const allPosts = await Post.find({ 'likes.userId': user._id.toString() }).skip((page - 1) * pageSize).limit(pageSize)
-    const totalCount = await Post.countDocuments()
+    const totalCount = await Post.countDocuments({ 'likes.userId': user._id.toString() })
     
     const nextPage = (page * pageSize < totalCount) ? page + 1 : null
     res.status(200).json({ posts: allPosts, totalCount, nextPage })
@@ -151,9 +151,9 @@ router.route('/add-image').post(authenticate, async (req, res) => {
         ])
         const totalPosts = resultTotalPosts[0].postCount
         console.log('Total number of posts across all users in the current month:', totalPosts)
-        if (totalPosts >= 20) {
-            return res.status(400).json({ message: 'You have reached the max count for this month' })
-        }
+        // if (totalPosts >= 20) {
+        //     return res.status(400).json({ message: 'You have reached the max count for this month' })
+        // }
 
         const post = new Post({
             description: '',

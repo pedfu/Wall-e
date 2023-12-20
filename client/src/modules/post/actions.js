@@ -54,5 +54,5 @@ export const generateNewImage = (body) => (dispatch) => dispatch({
 
 export const checkImageStatus = (id) => (dispatch) => dispatch({
     type: CHECK_IMAGE_STATUS.ACTION,
-    paylaod: postServices.checkNewImageStatus(id)
+    payload: postServices.checkNewImageStatus(id)
 })

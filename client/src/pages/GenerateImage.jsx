@@ -26,10 +26,12 @@ const GenerateImage = () => {
   const wasLoadingGeneratePost = usePrevious(isLoadingGeneratePost)
   const errorGeneratePost = useSelector(errorGenerateImageSelector)
   const newPost = useSelector(newImageSelector)
-  const userPosts = useSelector(userImagesSelector)
+  const userImages = useSelector(userImagesSelector)
 
   const [selectedTab, setSelectedTab] = useState(0)
   const [expanded, setExpanded] = useState(false)
+  const [refresh, setRefresh] = useState(false)
+  const [generating, setGenerating] = useState(false)
 
   const checkStatus = useCallback(async id => {
     const response = await postServices.checkNewImageStatus(id)
@@ -38,14 +40,17 @@ const GenerateImage = () => {
         checkStatus(id)
       }, 5000);
     } else {
-      dispatch(getUserImages())
+      setRefresh(true)
+      setGenerating(false)
     }
-  }, [])
+  }, [getUserImages, dispatch, refresh])
 
   useEffect(() => {
     if (!isLoadingGeneratePost && wasLoadingGeneratePost) {
       if (!errorGeneratePost && newPost) {
         checkStatus(newPost?._id)
+      } else {
+        setGenerating(false)
       }
     }
   }, [errorGeneratePost, checkStatus, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
@@ -88,6 +93,8 @@ const GenerateImage = () => {
 
   const generateImage = useCallback(async (prompt) => {
     if (!prompt) return
+
+    setGenerating(true)
     
     const body = {
       prompt: prompt
@@ -97,7 +104,7 @@ const GenerateImage = () => {
 
   const selectedPage = useMemo(() => {
     if (selectedTab === 0) {
-      return <ImageFromText generateImage={generateImage} />
+      return <ImageFromText generating={generating} refreshPage={refresh} setRefreshPage={setRefresh} generateImage={generateImage} />
     } else if (selectedTab === 1) {
       return <CommunityImages />
     } else if (selectedTab === 2) {
@@ -105,7 +112,7 @@ const GenerateImage = () => {
     } else {
       return <ComingSoon />
     }
-  }, [generateImage, selectedTab])
+  }, [generateImage, selectedTab, refresh, generating])
 
   return (
     <div className='flex overflow-y-hidden bg-darkGrey relative w-screen h-[calc(100vh-73px)]'>

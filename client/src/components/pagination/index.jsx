@@ -15,6 +15,7 @@ const Pagination = ({
     children, 
     hideTopBar,
     isLoading,
+    className,
     ...other
 }) => {
     const pageNumbers = [10, 25, 50, 100]
@@ -44,7 +45,7 @@ const Pagination = ({
                 <div>
                     {firstIndex + 1} - {lastIndex >= listSize ? firstIndex + listSize : lastIndex} de {totalQnt}
                 </div>
-                <div onClick={previousPage} className='icon-button mx-1 w-6 h-6 rounded-full flex align-middle justify-center cursor-pointer hover:bg-fontGrey'>
+                <button disabled={currentPage <= 1} onClick={previousPage} className='icon-button mx-1 w-6 h-6 rounded-full flex align-middle justify-center cursor-pointer hover:bg-fontGrey'>
                     <svg className='mt-1 mr-1' width="16px" height="16px" viewBox="-4.5 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                             <g id="Dribbble-Light-Preview" transform="translate(-345.000000, -6679.000000)" fill="#FFFFFF">
@@ -54,8 +55,8 @@ const Pagination = ({
                             </g>
                         </g>
                     </svg>
-                </div>
-                <div onClick={nextPage} className='icon-button w-6 h-6 rounded-full flex align-middle justify-center cursor-pointer hover:bg-fontGrey'>
+                </button>
+                <button disabled={lastIndex >= totalQnt} onClick={nextPage} className='icon-button w-6 h-6 rounded-full flex align-middle justify-center cursor-pointer hover:bg-fontGrey'>
                     <svg className='mt-1 ml-1' width="16px" height="16px" viewBox="-4.5 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                             <g id="Dribbble-Light-Preview" transform="translate(-305.000000, -6679.000000)" fill="#FFFFFF">
@@ -65,14 +66,14 @@ const Pagination = ({
                             </g>
                         </g>
                     </svg>
-                </div>
+                </button>
                 
             </div>
         )
     }, [firstIndex, lastIndex, listSize, totalQnt])  
 
     return (
-        <div className='overflow-y-auto max-h-[calc(100vh-17rem)]'>
+        <div className={`overflow-y-auto min-w-full ${className}`}>
             {renderPagination}
             {isLoading ? (
                 <div></div>

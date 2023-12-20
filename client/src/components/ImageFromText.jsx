@@ -15,7 +15,7 @@ const INITIAL_STATE = {
   params: {}
 }
 
-const ImageFromText = ({ generateImage }) => {
+const ImageFromText = ({ generateImage, refreshPage, setRefreshPage, generating }) => {
   const dispatch = useDispatch()
   const userPosts = useSelector(userImagesSelector)
   const error = useSelector(errorUserImagesSelector)
@@ -31,6 +31,15 @@ const ImageFromText = ({ generateImage }) => {
 
   const { currentPage, loading, nextPage, previousPage, refresh, resetCurrentPage, setCurrentPage } = useListPagination(getUserImages, GET_USER_IMAGES, state.params)
 
+  useEffect(() => {
+    if (refreshPage) {
+      setText('')
+      refresh()
+      resetCurrentPage()
+      setRefreshPage(false)
+    }
+  }, [refreshPage, refresh, resetCurrentPage, setRefreshPage])
+
   const openDetails = useCallback((postId) => {
     setSelectedPostId(postId)
   }, [])
@@ -45,7 +54,6 @@ const ImageFromText = ({ generateImage }) => {
 
   const onGenerateClick = useCallback(() => {
     generateImage(text)
-    // setModalPost(true)
   }, [generateImage, text])
 
   const onCreatePost = useCallback(text => {
@@ -72,9 +80,9 @@ const ImageFromText = ({ generateImage }) => {
         <ModalDetails closeDetails={closeDetails} imageId={selectedPostId} />
       )}
       <div className='w-full mb-2'>
-        <textarea placeholder='A realistic photograph of a young guy with red hair in space' className='w-[calc(100%-48px)] h-24 mx-4 mt-3 focus:outline-none text-white p-2 bg-grey rounded-md resize-none' rows={4} value={text} onChange={onChange} />
+        <textarea disabled={generating} placeholder='A realistic photograph of a young guy with red hair in space' className='w-[calc(100%-48px)] h-24 mx-4 mt-3 focus:outline-none text-white p-2 bg-grey rounded-md resize-none' rows={4} value={text} onChange={onChange} />
         <div className='w-[calc(100%-32px)] mt-2 flex justify-end'>
-          <button onClick={onGenerateClick} disabled={!text || !isLoggedIn} className='font-inter font-medium bg-[#6469ff] text-white px-4 py-2 rounded-md disabled:opacity-50'>Generate</button>
+          <button onClick={onGenerateClick} disabled={!text || !isLoggedIn || generating} className='font-inter font-medium bg-[#6469ff] text-white px-4 py-2 rounded-md disabled:opacity-50'>Generate</button>
         </div>
       </div>
       
@@ -88,6 +96,7 @@ const ImageFromText = ({ generateImage }) => {
         previousPage={previousPage}
         currentPage={currentPage}
         isLoading={loading}
+        className={'max-h-[calc(100vh-17rem)]'}
       >
         <div className='flex justify-center w-full flex-wrap'>
           {userPosts.images.map((item, index) => (

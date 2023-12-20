@@ -75,6 +75,7 @@ const CommunityImages = () => {
             previousPage={previousPage}
             currentPage={currentPage}
             isLoading={loading}
+            className={'max-h-[calc(100vh-5.75rem)]'}
           >
             <div className='flex justify-center w-full flex-wrap'>
               {allImages.images.map((item, index) => (

@@ -23,7 +23,7 @@ const INITIAL_STATE = {
 
 export default createReducer(INITIAL_STATE, {
     [GENERATE_NEW_IMAGE.FULFILLED]: (state, action) => {
-        const newImages = [...state.userImages.images, action.payload.data]
+        const newImages = [action.payload.data, ...state.userImages.images]
         return { ...state, newImage: action.payload.data, userImages: { ...state.userImages, images: newImages }}
     },
     [LIKE_IMAGE.FULFILLED]: (state, action) => {
