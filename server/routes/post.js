@@ -2,7 +2,8 @@ const express = require('express');
 const dotenv = require('dotenv')
 const Post = require('../mongodb/models/post.js');
 const authenticate = require('../middlewares/auth.js')
-const { queue } = require('../queue.js')
+const { queue } = require('../queue.js');
+const User = require('../mongodb/models/user.js');
 
 dotenv.config()
 
@@ -126,29 +127,35 @@ router.route('/add-image').post(authenticate, async (req, res) => {
               { email: user.email },
               { ipAddress: user.ipAddress }
             ]
-        };
-
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-        // Perform aggregation to count the number of posts for each user in the current month
-        const resultTotalPosts = await Post.aggregate([
+          };
+          
+          // Get all users based on the combined query
+          const users = await User.find(combinedQuery);
+          const userIds = users.map(user => user._id.toString());
+          
+          const now = new Date();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);          
+          
+          // Perform aggregation to count the number of posts for each user in the current month
+          const resultTotalPosts = await Post.aggregate([
             {
-                $match: {
+              $match: {
+                'createdBy.userId': { $in: userIds },
                 createdAt: {
-                    $gte: startOfMonth,
-                    $lte: endOfMonth,
+                  $gte: startOfMonth,
+                  $lte: endOfMonth,
                 },
-                },
+              },
             },
             {
-                $group: {
+              $group: {
                 _id: '$createdBy.userId',
                 postCount: { $sum: 1 },
-                },
+              },
             },
-        ])
+          ]);
+
         const totalPosts = resultTotalPosts[0].postCount
         console.log('Total number of posts across all users in the current month:', totalPosts)
         if (totalPosts >= 20) {
