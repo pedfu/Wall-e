@@ -127,39 +127,41 @@ router.route('/add-image').post(authenticate, async (req, res) => {
               { email: user.email },
               { ipAddress: user.ipAddress }
             ]
-          };
+        };
           
-          // Get all users based on the combined query
-          const users = await User.find(combinedQuery);
-          const userIds = users.map(user => user._id.toString());
-          
-          const now = new Date();
-          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);          
-          
-          // Perform aggregation to count the number of posts for each user in the current month
-          const resultTotalPosts = await Post.aggregate([
+        // Get all users based on the combined query
+        const users = await User.find(combinedQuery);
+        const userIds = users.map(user => user._id.toString());
+        
+        if (!user?.isAdmin) {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);          
+            
+            // Perform aggregation to count the number of posts for each user in the current month
+            const resultTotalPosts = await Post.aggregate([
             {
-              $match: {
+                $match: {
                 'createdBy.userId': { $in: userIds },
                 createdAt: {
-                  $gte: startOfMonth,
-                  $lte: endOfMonth,
+                    $gte: startOfMonth,
+                    $lte: endOfMonth,
                 },
-              },
+                },
             },
             {
-              $group: {
+                $group: {
                 _id: '$createdBy.userId',
                 postCount: { $sum: 1 },
-              },
+                },
             },
-          ]);
+            ]);
 
         const totalPosts = resultTotalPosts?.reduce((prev, curr) => prev + curr?.postCount, 0)
         console.log('Total number of posts across all users in the current month:', totalPosts)
         if (totalPosts >= 20) {
             return res.status(400).json({ message: 'You have reached the max count for this month' })
+        }
         }
 
         const post = new Post({

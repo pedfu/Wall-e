@@ -12,10 +12,10 @@ export const GENERATE_NEW_IMAGE = defineAction('GENERATE_NEW_IMAGE')
 export const CHECK_IMAGE_STATUS = defineAction('CHECK_IMAGE_STATUS')
 export const GET_USER_IMAGES = defineAction('GET_USER_IMAGES')
 
-export const publicImage = (id, body) => (dispatch) => dispatch({
-    type: PUBLIC_IMAGE.ACTION,
-    payload: postServices.publicImageRequest(id, body)
-})
+// export const publicImage = (id, body) => (dispatch) => dispatch({
+//     type: PUBLIC_IMAGE.ACTION,
+//     payload: postServices.publicImageRequest(id, body)
+// })
 
 export const likeImage = (id, body) => (dispatch) => dispatch({
     type: LIKE_IMAGE.ACTION,
