@@ -107,7 +107,7 @@ const Login = () => {
             <div></div>
         </div>
         <div className='w-1/2 h-[calc(100vh-73px)] mx-6 flex items-center'>
-            <img className='w-full h-[calc(100vh-90px)] object-cover rounded-3xl' src='https://cdn.openart.ai/uploads/image_random_EQzmLBWS_1664596083880_1024.webp' />
+            <img className='w-full h-[calc(100vh-90px)] object-cover rounded-3xl' src='https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/7e60ca3f-a389-4e8b-96c4-2e18029dee8d' />
         </div>
     </div>
   )

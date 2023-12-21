@@ -73,7 +73,7 @@ const App = () => {
       )}
 
       <div id='tooltip' className={`absolute top-7 w-full flex justify-center ${tooltip.show ? 'show' : ''}`}>
-        <p className={`${tooltip.type} py-3 px-8 rounded-md max-w-sm text-sm`}>{tooltip.message}</p>
+        <p className={`${tooltip.type} py-3 px-8 rounded-md max-w-sm text-sm text-white`}>{tooltip.message}</p>
       </div>
     </BrowserRouter>
   )

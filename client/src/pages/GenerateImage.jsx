@@ -9,6 +9,7 @@ import { usePrevious } from '../hooks/use-previous';
 import LikedImages from '../components/LikedImages';
 import * as postServices from '../services/post'
 import CommunityImages from '../components/CommunityImages';
+import { openTooltip } from '../modules/tooltip/actions';
 
 const Image = ({ src }) => {
     return (
@@ -50,10 +51,12 @@ const GenerateImage = () => {
       if (!errorGeneratePost && newPost) {
         checkStatus(newPost?._id)
       } else {
+        console.log(errorGeneratePost)
+        dispatch(openTooltip({ message: errorGeneratePost?.message, type: 'error' }))
         setGenerating(false)
       }
     }
-  }, [errorGeneratePost, checkStatus, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
+  }, [errorGeneratePost, checkStatus, openTooltip, dispatch, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
 
   const options = [
     {

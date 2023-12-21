@@ -10,7 +10,7 @@ dotenv.config()
 const router = express.Router()
 
 // get posts
-router.route('/').get(authenticate, async (req, res) => {
+router.route('/').get(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const pageSize = parseInt(req.query.pageSize) || 20
 
@@ -48,7 +48,7 @@ router.route('/liked').get(authenticate, async (req, res) => {
 })
 
 // get post
-router.route('/:id').get(authenticate, async (req, res) => {
+router.route('/:id').get(async (req, res) => {
     const { id } = req.params
     if (!id || id === 'undefined') return 
     await Post.findOne({ _id: id }).then(post => {
@@ -156,7 +156,7 @@ router.route('/add-image').post(authenticate, async (req, res) => {
             },
           ]);
 
-        const totalPosts = resultTotalPosts[0].postCount
+        const totalPosts = resultTotalPosts?.reduce((prev, curr) => prev + curr?.postCount, 0)
         console.log('Total number of posts across all users in the current month:', totalPosts)
         if (totalPosts >= 20) {
             return res.status(400).json({ message: 'You have reached the max count for this month' })

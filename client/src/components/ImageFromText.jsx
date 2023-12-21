@@ -86,24 +86,29 @@ const ImageFromText = ({ generateImage, refreshPage, setRefreshPage, generating 
         </div>
       </div>
       
-
-      <Pagination
-        totalQnt={userPosts.totalCount}
-        listSize={userPosts.images?.length}
-        pageSize={state.pageSize}
-        onChangePageSize={onChangePage}
-        nextPage={nextPage}
-        previousPage={previousPage}
-        currentPage={currentPage}
-        isLoading={loading}
-        className={'max-h-[calc(100vh-17rem)]'}
-      >
-        <div className='flex justify-center w-full flex-wrap'>
-          {userPosts.images.map((item, index) => (
-            <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
-          ))}
+      {!error ? (
+        <Pagination
+          totalQnt={userPosts.totalCount}
+          listSize={userPosts.images?.length}
+          pageSize={state.pageSize}
+          onChangePageSize={onChangePage}
+          nextPage={nextPage}
+          previousPage={previousPage}
+          currentPage={currentPage}
+          isLoading={loading}
+          className={'max-h-[calc(100vh-17rem)]'}
+        >
+          <div className='flex justify-center w-full flex-wrap'>
+            {userPosts.images.map((item, index) => (
+              <Card key={item.image} src={item.image} onClick={() => openDetails(item._id)} isLoading={!item.image && Math.abs(new Date() - new Date(item.createdAt)) < 600000} />
+            ))}
+          </div>
+        </Pagination>
+      ) : (
+        <div className='flex w-full justify-center text-white mt-5'>
+          {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}
         </div>
-      </Pagination>
+      )}
     </>
   )
 }
