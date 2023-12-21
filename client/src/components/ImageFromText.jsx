@@ -5,7 +5,7 @@ import ModalPost from './ModalPost'
 import { useDispatch, useSelector } from 'react-redux'
 import { errorUserImagesSelector, loadingUserImagesSelector, newImageSelector, userImagesSelector } from '../modules/post/selector'
 import { isLoggedSelector } from '../modules/authentication/selector'
-import { GET_USER_IMAGES, getUserImages, publicImage } from '../modules/post/actions'
+import { GET_USER_IMAGES, getUserImages } from '../modules/post/actions'
 import Pagination from './pagination'
 import useListPagination from '../hooks/use-list-pagination'
 
@@ -57,7 +57,7 @@ const ImageFromText = ({ generateImage, refreshPage, setRefreshPage, generating 
   }, [generateImage, text])
 
   const onCreatePost = useCallback(text => {
-    dispatch(publicImage(newImage._id, { description: text, isPublic: true }))
+    // dispatch(publicImage(newImage._id, { description: text, isPublic: true }))
     setModalPost(false)
   }, [])
 
