@@ -160,7 +160,7 @@ const SignUp = () => {
             <div></div>
         </div>
         <div className='w-1/2 h-[calc(100vh-73px)] mx-6 flex items-center'>
-            <img className='w-full h-[calc(100vh-90px)] object-cover rounded-3xl' src='https://cdn.openart.ai/published/4yVY24VTP48ZjPPvGDzY/kqLEnPxe_p0DC_1024.webp' />
+            <img className='w-full h-[calc(100vh-90px)] object-cover rounded-3xl' src='https://pedrofamouspersons-images.s3.amazonaws.com/ai-images/55b1eef7-d12d-4f6c-861d-692a44aa3ce6' />
         </div>
     </div>
   )

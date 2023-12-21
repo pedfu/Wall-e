@@ -2,14 +2,15 @@ const express = require('express');
 const dotenv = require('dotenv')
 const Post = require('../mongodb/models/post.js');
 const authenticate = require('../middlewares/auth.js')
-const { queue } = require('../queue.js')
+const { queue } = require('../queue.js');
+const User = require('../mongodb/models/user.js');
 
 dotenv.config()
 
 const router = express.Router()
 
 // get posts
-router.route('/').get(authenticate, async (req, res) => {
+router.route('/').get(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const pageSize = parseInt(req.query.pageSize) || 20
 
@@ -26,8 +27,8 @@ router.route('/my-posts').get(authenticate, async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const pageSize = parseInt(req.query.pageSize) || 20
 
-    const allPosts = await Post.find({ 'createdBy.userId': user._id }).skip((page - 1) * pageSize).limit(pageSize)
-    const totalCount = await Post.countDocuments()
+    const allPosts = await Post.find({ 'createdBy.userId': user._id }).sort({ createdAt: -1 }).skip((page - 1) * pageSize).limit(pageSize)
+    const totalCount = await Post.countDocuments({ 'createdBy.userId': user._id });
     
     const nextPage = (page * pageSize < totalCount) ? page + 1 : null
     res.status(200).json({ posts: allPosts, totalCount, nextPage })
@@ -40,14 +41,14 @@ router.route('/liked').get(authenticate, async (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 20
 
     const allPosts = await Post.find({ 'likes.userId': user._id.toString() }).skip((page - 1) * pageSize).limit(pageSize)
-    const totalCount = await Post.countDocuments()
+    const totalCount = await Post.countDocuments({ 'likes.userId': user._id.toString() })
     
     const nextPage = (page * pageSize < totalCount) ? page + 1 : null
     res.status(200).json({ posts: allPosts, totalCount, nextPage })
 })
 
 // get post
-router.route('/:id').get(authenticate, async (req, res) => {
+router.route('/:id').get(async (req, res) => {
     const { id } = req.params
     if (!id || id === 'undefined') return 
     await Post.findOne({ _id: id }).then(post => {
@@ -126,30 +127,36 @@ router.route('/add-image').post(authenticate, async (req, res) => {
               { email: user.email },
               { ipAddress: user.ipAddress }
             ]
-        };
-
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-        // Perform aggregation to count the number of posts for each user in the current month
-        const resultTotalPosts = await Post.aggregate([
+          };
+          
+          // Get all users based on the combined query
+          const users = await User.find(combinedQuery);
+          const userIds = users.map(user => user._id.toString());
+          
+          const now = new Date();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);          
+          
+          // Perform aggregation to count the number of posts for each user in the current month
+          const resultTotalPosts = await Post.aggregate([
             {
-                $match: {
+              $match: {
+                'createdBy.userId': { $in: userIds },
                 createdAt: {
-                    $gte: startOfMonth,
-                    $lte: endOfMonth,
+                  $gte: startOfMonth,
+                  $lte: endOfMonth,
                 },
-                },
+              },
             },
             {
-                $group: {
+              $group: {
                 _id: '$createdBy.userId',
                 postCount: { $sum: 1 },
-                },
+              },
             },
-        ])
-        const totalPosts = resultTotalPosts[0].postCount
+          ]);
+
+        const totalPosts = resultTotalPosts?.reduce((prev, curr) => prev + curr?.postCount, 0)
         console.log('Total number of posts across all users in the current month:', totalPosts)
         if (totalPosts >= 20) {
             return res.status(400).json({ message: 'You have reached the max count for this month' })

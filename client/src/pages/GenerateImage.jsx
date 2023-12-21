@@ -9,6 +9,7 @@ import { usePrevious } from '../hooks/use-previous';
 import LikedImages from '../components/LikedImages';
 import * as postServices from '../services/post'
 import CommunityImages from '../components/CommunityImages';
+import { openTooltip } from '../modules/tooltip/actions';
 
 const Image = ({ src }) => {
     return (
@@ -26,14 +27,12 @@ const GenerateImage = () => {
   const wasLoadingGeneratePost = usePrevious(isLoadingGeneratePost)
   const errorGeneratePost = useSelector(errorGenerateImageSelector)
   const newPost = useSelector(newImageSelector)
-  const userPosts = useSelector(userImagesSelector)
+  const userImages = useSelector(userImagesSelector)
 
   const [selectedTab, setSelectedTab] = useState(0)
   const [expanded, setExpanded] = useState(false)
-
-  useEffect(() => {
-    dispatch(getUserImages())
-  }, [dispatch])
+  const [refresh, setRefresh] = useState(false)
+  const [generating, setGenerating] = useState(false)
 
   const checkStatus = useCallback(async id => {
     const response = await postServices.checkNewImageStatus(id)
@@ -42,17 +41,22 @@ const GenerateImage = () => {
         checkStatus(id)
       }, 5000);
     } else {
-      dispatch(getUserImages())
+      setRefresh(true)
+      setGenerating(false)
     }
-  }, [])
+  }, [getUserImages, dispatch, refresh])
 
   useEffect(() => {
     if (!isLoadingGeneratePost && wasLoadingGeneratePost) {
       if (!errorGeneratePost && newPost) {
         checkStatus(newPost?._id)
+      } else {
+        console.log(errorGeneratePost)
+        dispatch(openTooltip({ message: errorGeneratePost?.message, type: 'error' }))
+        setGenerating(false)
       }
     }
-  }, [errorGeneratePost, checkStatus, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
+  }, [errorGeneratePost, checkStatus, openTooltip, dispatch, isLoadingGeneratePost, newPost, wasLoadingGeneratePost])
 
   const options = [
     {
@@ -92,6 +96,8 @@ const GenerateImage = () => {
 
   const generateImage = useCallback(async (prompt) => {
     if (!prompt) return
+
+    setGenerating(true)
     
     const body = {
       prompt: prompt
@@ -101,7 +107,7 @@ const GenerateImage = () => {
 
   const selectedPage = useMemo(() => {
     if (selectedTab === 0) {
-      return <ImageFromText generateImage={generateImage} />
+      return <ImageFromText generating={generating} refreshPage={refresh} setRefreshPage={setRefresh} generateImage={generateImage} />
     } else if (selectedTab === 1) {
       return <CommunityImages />
     } else if (selectedTab === 2) {
@@ -109,7 +115,7 @@ const GenerateImage = () => {
     } else {
       return <ComingSoon />
     }
-  }, [generateImage, selectedTab])
+  }, [generateImage, selectedTab, refresh, generating])
 
   return (
     <div className='flex overflow-y-hidden bg-darkGrey relative w-screen h-[calc(100vh-73px)]'>

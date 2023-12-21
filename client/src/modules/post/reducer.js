@@ -23,7 +23,7 @@ const INITIAL_STATE = {
 
 export default createReducer(INITIAL_STATE, {
     [GENERATE_NEW_IMAGE.FULFILLED]: (state, action) => {
-        const newImages = [...state.userImages.images, action.payload.data]
+        const newImages = [action.payload.data, ...state.userImages.images]
         return { ...state, newImage: action.payload.data, userImages: { ...state.userImages, images: newImages }}
     },
     [LIKE_IMAGE.FULFILLED]: (state, action) => {
@@ -57,17 +57,17 @@ export default createReducer(INITIAL_STATE, {
     },
     [GET_ALL_IMAGES.FULFILLED]: (state, action) => {
         const { totalCount, nextPage, posts } = action.payload.data
-        return { ...state, allImages: { images: posts, totalCount, nextPage }}
+        return { ...state, allImages: { images: posts, totalCount, nextPage }};
     },
     [CHANGE_LIKE_IMAGE.FULFILLED]: (state, action) => {
         return { ...state, imageDetails: action.payload.data }
     },
     [GET_LIKED_IMAGES.FULFILLED]: (state, action) => {
         const { totalCount, nextPage, posts } = action.payload.data
-        return { ...state, likedImages: { images: posts, totalCount, nextPage } }
+        return { ...state, likedImages: { images: posts, totalCount, nextPage }};
     },
     [GET_USER_IMAGES.FULFILLED]: (state, action) => {
-        const { totalCount, nextPage, posts } = action.payload.data
-        return { ...state, userImages: { images: posts, totalCount, nextPage }}
+        const { totalCount, nextPage, posts } = action.payload.data        
+        return { ...state, userImages: { images: posts, totalCount, nextPage }};
     }
 })
