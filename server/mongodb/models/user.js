@@ -17,7 +17,8 @@ const UserSchema = new mongoose.Schema({
         userId: { type: String, required: true },
         username: { type: String, required: true },
     }],
-    monthCount: { type: Number, default: 0, }
+    monthCount: { type: Number, default: 0, },
+    isAdmin: { type: Boolean, default: false }
 }, { timestamps: true })
 
 const User = mongoose.model('User', UserSchema)
