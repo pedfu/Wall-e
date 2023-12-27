@@ -75,10 +75,6 @@ const ImageFromText = ({ generateImage, refreshPage, setRefreshPage, generating 
 
   return (
     <>
-      {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newImage?.image} isLoading={loadingNewImage} />}
-      {selectedPostId !== null && (
-        <ModalDetails closeDetails={closeDetails} imageId={selectedPostId} />
-      )}
       <div className='w-full mb-2'>
         <textarea disabled={generating} placeholder='A realistic photograph of a young guy with red hair in space' className='w-[calc(100%-48px)] h-24 mx-4 mt-3 focus:outline-none text-white p-2 bg-grey rounded-md resize-none' rows={4} value={text} onChange={onChange} />
         <div className='w-[calc(100%-32px)] mt-2 flex justify-end'>
@@ -108,6 +104,10 @@ const ImageFromText = ({ generateImage, refreshPage, setRefreshPage, generating 
         <div className='flex w-full justify-center text-white mt-5'>
           {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}
         </div>
+      )}
+      {modalPost && <ModalPost onSubmit={onCreatePost} onClose={() => onCloseModalPost()} prompt={`${text}`} image={newImage?.image} isLoading={loadingNewImage} />}
+      {selectedPostId !== null && (
+        <ModalDetails closeDetails={closeDetails} imageId={selectedPostId} />
       )}
     </>
   )

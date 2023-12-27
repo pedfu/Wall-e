@@ -99,8 +99,15 @@ const ModalDetails = ({ imageId, closeDetails }) => {
                 </div>
               </div>
               <div className='w-[300px] pr-4 mb-2 my-4 mr-3 justify-center mt-2 flex flex-col items-start'>
-                <div className='cursor-pointer' onClick={handleLike}>
-                  {renderLike}
+                <div className='cursor-pointer flex items-center' onClick={handleLike}>
+                  <div>
+                    {renderLike}
+                  </div>
+                  <p className='ml-1 text-sm font-light text-white'>
+                    {imageDetails.likes?.length > 0 ? imageDetails.likes?.length : 'Be the first to like'}
+                    {' '}
+                    {imageDetails.likes?.length > 1 ? 'likes' : imageDetails.likes?.length === 1 ? 'like' : null}
+                  </p>
                 </div>
                 <div className='flex w-full items-center justify-center'>
                   <textarea disabled={!isLoggedIn} onChange={onChange} value={comment} className='mt-1 p-2 rounded-md w-[calc(100%-30px)] text-sm text-white font-light bg-grey resize-none' rows={2} placeholder='Comment something...' />

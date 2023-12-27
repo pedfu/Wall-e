@@ -41,9 +41,6 @@ const LikedImages = () => {
 
   return (
     <>
-      {selectedId !== null && (
-        <ModalDetails closeDetails={closeDetails} imageId={selectedId} />
-      )}
       <div className='flex flex-wrap overflow-y-auto max-h-[calc(100vh-250px)] items-start justify-center sm:justify-start w-full'>
         {!error ? (
           <Pagination
@@ -69,6 +66,9 @@ const LikedImages = () => {
           </div>
         )}
       </div>
+      {selectedId !== null && (
+        <ModalDetails closeDetails={closeDetails} imageId={selectedId} />
+      )}
     </>
   )
 }
