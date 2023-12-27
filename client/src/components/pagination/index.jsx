@@ -70,13 +70,15 @@ const Pagination = ({
                 
             </div>
         )
-    }, [firstIndex, lastIndex, listSize, totalQnt])  
-
+    }, [firstIndex, lastIndex, listSize, totalQnt])
+    
     return (
-        <div className={`overflow-y-auto min-w-full ${className}`}>
+        <div className={`${isLoading ? 'overflow-y-hidden' : 'overflow-y-auto'} min-w-full ${className}`}>
             {renderPagination}
             {isLoading ? (
-                <div></div>
+                <div className='w-full h-full min-h-[calc(100vh-180px)] flex items-center justify-center'>
+                    <svg className='animate-spin' width="30px" height="30px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><path fillRule="evenodd" clipRule="evenodd" d="M13.917 7A6.002 6.002 0 0 0 2.083 7H1.071a7.002 7.002 0 0 1 13.858 0h-1.012z"/></svg>
+                </div>
             ) : children}
             {renderPagination}
         </div>

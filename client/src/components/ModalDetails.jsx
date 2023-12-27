@@ -72,7 +72,13 @@ const ModalDetails = ({ imageId, closeDetails }) => {
             </div>
 
             <div className='px-4 w-[calc(100%-300px)] flex items-center'>
-                <img className='' src={imageDetails?.image} />
+              {imageDetails?.image ? (
+                <img className='min-w-[400px]' src={imageDetails?.image} />
+              ) : (
+                <div className='w-full h-full min-h-[400px] min-w-[400px] flex items-center justify-center'>
+                  <svg className='animate-spin' width="30px" height="30px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><path fillRule="evenodd" clipRule="evenodd" d="M13.917 7A6.002 6.002 0 0 0 2.083 7H1.071a7.002 7.002 0 0 1 13.858 0h-1.012z"/></svg>
+                </div>
+              )}
             </div>
 
             <div className='w-[300px] h-[560px] text-fontGrey flex items-start flex-col justify-between'>

@@ -64,9 +64,8 @@ const SignUp = () => {
         if (!state.email) error['email'] = 'Email not fulfilled' 
         if (!state.username) error['username'] = 'Username not fulfilled' 
         if (!state.password || passwordQuality !== PASSWORD_QUALITY.STRONG) error['password'] = 'Password not fulfilled or weak'
-
         setErrors(error)
-        if (error) return false
+        if (Object.keys(error).length > 0) return false
         return true
     }, [state])
 
@@ -85,6 +84,7 @@ const SignUp = () => {
 
     const onSubmit = useCallback(async event => {
         event.preventDefault()
+        
         if (!validateFields()) return
         if (Object.keys(errors).length > 0) return
         const body = {
@@ -150,7 +150,7 @@ const SignUp = () => {
                     handleIconClick={handlePasswordVisibility}
                     message={passwordQuality ? `Your password is ${passwordQuality}` : null}
                 />
-                <button className='py-4 px-16 mt-4 border rounded-[5rem]'>Create account</button>
+                <button type='submit' className='py-4 px-16 mt-4 border rounded-[5rem]'>Create account</button>
                 <p className='text-sm mt-2'>Already have an Account? <Link to='/login' className='font-semibold underline cursor-pointer'>Log in</Link></p>
             </form>
 

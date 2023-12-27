@@ -57,9 +57,11 @@ const LikedImages = () => {
             isLoading={loading}
             className={'max-h-[calc(100vh-5.75rem)]'}
           >
-            {likedImages?.images?.map((item, index) => (
-              <Card key={item.image} src={item.image} onClick={() => openDetails(index)} />
-            ))}
+            <div className='flex justify-center w-full flex-wrap'>
+              {likedImages?.images?.map((item, index) => (
+                <Card key={item.image} src={item.image} onClick={() => openDetails(index)} />
+              ))}
+            </div>
           </Pagination>
         ) : (
           <div className='flex w-full justify-center text-white mt-5'>

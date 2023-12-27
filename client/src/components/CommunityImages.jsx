@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Card, Loader, ModalDetails } from '.'
-import { useDispatch, useSelector } from 'react-redux'
-import { allImagesSelector, errorAllImageSelector, loadingAllImageSelector } from '../modules/post/selector'
+import { useCallback, useState } from 'react'
+import { Card, ModalDetails } from '.'
+import { useSelector } from 'react-redux'
+import { allImagesSelector, errorAllImageSelector } from '../modules/post/selector'
 import { isLoggedSelector } from '../modules/authentication/selector'
 import { GET_ALL_IMAGES, getAllImages } from '../modules/post/actions'
-import { usePrevious } from '../hooks/use-previous'
-import InfiniteScroll from 'react-infinite-scroller'
 import Pagination from './pagination'
 import useListPagination from '../hooks/use-list-pagination'
 
@@ -26,23 +24,6 @@ const CommunityImages = () => {
 
   const { currentPage, loading, nextPage, previousPage, refresh, resetCurrentPage, setCurrentPage} = useListPagination(getAllImages, GET_ALL_IMAGES, state.params)
 
-  // const fetchNextItems = useCallback(() => {
-  //   if (isLoading) return
-
-  //   dispatch(getAllImages(allImages.nextPage || 1, state.pageSize))
-  // }, [state.pageSize, allImages.nextPage, isLoading, dispatch])
-
-  // useEffect(() => {
-  //   fetchNextItems()
-  // }, [])
-
-  // useEffect(() => {
-  //   setState({
-  //     totalCount: allImages.totalCount,
-  //     page: allImages.page || 1
-  //   })
-  // }, [allImages])
-
   const onChangePage = useCallback((event) => {
     const { name, value } = event.target
     setState(prevState => ({
@@ -61,9 +42,6 @@ const CommunityImages = () => {
 
   return (
     <>
-      {selectedPostId !== null && (
-        <ModalDetails closeDetails={closeDetails} imageId={selectedPostId} />
-      )}
       {!error ? 
         (
           <Pagination
@@ -87,6 +65,9 @@ const CommunityImages = () => {
         <div className='flex w-full justify-center text-white mt-5'>
           {isLoggedIn ? 'An unexpected error happened' : 'You are not logged in'}
         </div>
+      )}
+      {selectedPostId !== null && (
+        <ModalDetails closeDetails={closeDetails} imageId={selectedPostId} />
       )}
     </>
   )
