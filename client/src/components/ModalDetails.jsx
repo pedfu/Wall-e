@@ -52,14 +52,6 @@ const ModalDetails = ({ imageId, closeDetails }) => {
     )
   }, [imageDetails, user])
 
-  if (isImageDetailsLoading) {
-    return 'loading'
-  }
-
-  if (!imageDetails) {
-    return 'nada'
-  }
-
   return (
     <>
       <div
@@ -71,54 +63,64 @@ const ModalDetails = ({ imageId, closeDetails }) => {
                 x
             </div>
 
-            <div className='px-4 w-[calc(100%-300px)] flex items-center'>
-              {imageDetails?.image ? (
-                <img className='min-w-[400px]' src={imageDetails?.image} />
-              ) : (
-                <div className='w-full h-full min-h-[400px] min-w-[400px] flex items-center justify-center'>
+            {isImageDetailsLoading ? (
+              <div>
+                <div className='w-full h-full min-h-[400px] min-w-[800px] flex items-center justify-center'>
                   <svg className='animate-spin' width="30px" height="30px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><path fillRule="evenodd" clipRule="evenodd" d="M13.917 7A6.002 6.002 0 0 0 2.083 7H1.071a7.002 7.002 0 0 1 13.858 0h-1.012z"/></svg>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <>
+                <div className='px-4 w-[calc(100%-300px)] flex items-center'>
+                  {imageDetails?.image ? (
+                    <img className='min-w-[400px]' src={imageDetails?.image} />
+                  ) : (
+                    <div className='w-full h-full min-h-[400px] min-w-[400px] flex items-center justify-center'>
+                      <svg className='animate-spin' width="30px" height="30px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><path fillRule="evenodd" clipRule="evenodd" d="M13.917 7A6.002 6.002 0 0 0 2.083 7H1.071a7.002 7.002 0 0 1 13.858 0h-1.012z"/></svg>
+                    </div>
+                  )}
+                </div>
 
-            <div className='w-[300px] h-[560px] text-fontGrey flex items-start flex-col justify-between'>
-              <div className='pr-2 max-h-[calc(560px-110px)]'>
-                <p className='text-white mb-2 mt-8'>Prompt</p>
-                <p className='text-center bg-grey rounded-md p-1'>{imageDetails?.prompt}</p>
+                <div className='w-[300px] h-[560px] text-fontGrey flex items-start flex-col justify-between'>
+                  <div className='pr-2 max-h-[calc(560px-110px)]'>
+                    <p className='text-white mb-2 mt-8'>Prompt</p>
+                    <p className='text-center bg-grey rounded-md p-1'>{imageDetails?.prompt}</p>
 
-                <div className='w-full mt-3 text-white max-h-[calc(560px-235px)] overflow-y-auto'>
-                  <h4 className='mb-2'>Comments</h4>
-                  <div>
-                    {imageDetails.comments?.map((c, index) => (
-                      <div key={`${c.createdBy.username}-${index}`} className='flex items-center my-2'>
-                        <p className='font-medium text-sm mr-2 text-fontGrey'>{c.createdBy.username}</p>
-                        <p className='text-sm font-light'>{c.comment}</p>
+                    <div className='w-full mt-3 text-white max-h-[calc(560px-235px)] overflow-y-auto'>
+                      <h4 className='mb-2'>Comments</h4>
+                      <div>
+                        {imageDetails.comments?.map((c, index) => (
+                          <div key={`${c.createdBy.username}-${index}`} className='flex items-center my-2'>
+                            <p className='font-medium text-sm mr-2 text-fontGrey'>{c.createdBy.username}</p>
+                            <p className='text-sm font-light'>{c.comment}</p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                  </div>
+                  <div className='w-[300px] pr-4 mb-2 my-4 mr-3 justify-center mt-2 flex flex-col items-start'>
+                    <div className='cursor-pointer flex items-center' onClick={handleLike}>
+                      <div>
+                        {renderLike}
+                      </div>
+                      <p className='ml-1 text-sm font-light text-white'>
+                        {imageDetails.likes?.length > 0 ? imageDetails.likes?.length : 'Be the first to like'}
+                        {' '}
+                        {imageDetails.likes?.length > 1 ? 'likes' : imageDetails.likes?.length === 1 ? 'like' : null}
+                      </p>
+                    </div>
+                    <div className='flex w-full items-center justify-center'>
+                      <textarea disabled={!isLoggedIn} onChange={onChange} value={comment} className='mt-1 p-2 rounded-md w-[calc(100%-30px)] text-sm text-white font-light bg-grey resize-none' rows={2} placeholder='Comment something...' />
+                      <div className='ml-2 cursor-pointer' onClick={handleComment}>
+                        <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z" stroke="#767675" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className='w-[300px] pr-4 mb-2 my-4 mr-3 justify-center mt-2 flex flex-col items-start'>
-                <div className='cursor-pointer flex items-center' onClick={handleLike}>
-                  <div>
-                    {renderLike}
-                  </div>
-                  <p className='ml-1 text-sm font-light text-white'>
-                    {imageDetails.likes?.length > 0 ? imageDetails.likes?.length : 'Be the first to like'}
-                    {' '}
-                    {imageDetails.likes?.length > 1 ? 'likes' : imageDetails.likes?.length === 1 ? 'like' : null}
-                  </p>
-                </div>
-                <div className='flex w-full items-center justify-center'>
-                  <textarea disabled={!isLoggedIn} onChange={onChange} value={comment} className='mt-1 p-2 rounded-md w-[calc(100%-30px)] text-sm text-white font-light bg-grey resize-none' rows={2} placeholder='Comment something...' />
-                  <div className='ml-2 cursor-pointer' onClick={handleComment}>
-                    <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z" stroke="#767675" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
+                </>
+              )}
           </div>
         </div>
       </div>
